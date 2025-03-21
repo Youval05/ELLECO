@@ -1,0 +1,44 @@
+{
+  "name": "base-parfaite-pwa",
+  "version": "0.1.0",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "dev": "next dev -p 3001",
+    "build": "next build",
+    "start": "next start -p 3001",
+    "lint": "next lint",
+    "deploy": "node deploy.js",
+    "deploy-prod": "cross-env NODE_ENV=production node deploy.js",
+    "start-online": "node start-online.js",
+    "start-prod": "node start-prod.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "description": "",
+  "dependencies": {
+    "@firebase/firestore": "^4.7.6",
+    "@heroicons/react": "^2.2.0",
+    "firebase": "^11.2.0",
+    "framer-motion": "^12.0.6",
+    "next": "^14.2.24",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "reusify": "^1.0.4",
+    "zustand": "^4.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "autoprefixer": "^10.0.1",
+    "cross-env": "^7.0.3",
+    "eslint": "8.57.1",
+    "eslint-config-next": "15.1.6",
+    "postcss": "^8",
+    "tailwindcss": "^3.3.0",
+    "typescript": "^5"
+  }
+}

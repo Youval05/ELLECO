@@ -1,0 +1,7 @@
+# Environnements
+.env*.local
+.firebase
+
+# Build
+.next
+node_modules

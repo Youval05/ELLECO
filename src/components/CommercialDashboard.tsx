@@ -156,30 +156,31 @@ const CommercialDashboard = () => {
 
     const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault();
-      const updates: OrderUpdateData = {
-        reference: editedOrder.reference,
-        pallets: editedOrder.pallets,
-        status: editedOrder.status
-      };
+      if (editedOrder) {
+        const updates: Partial<Order> = {};
 
-      // Gestion de la date
-      if (editedOrder.plannedDeliveryDate && editedOrder.plannedDeliveryDate.trim() !== '') {
-        try {
-          const date = new Date(editedOrder.plannedDeliveryDate);
-          if (!isNaN(date.getTime())) {
-            updates.plannedDeliveryDate = date;
-          } else {
+        if (editedOrder.plannedDeliveryDate && editedOrder.plannedDeliveryDate.trim() !== '') {
+          try {
+            const date = new Date(editedOrder.plannedDeliveryDate);
+            if (!isNaN(date.getTime())) {
+              updates.plannedDeliveryDate = date;
+              updates.status = 'planifiée';
+            }
+          } catch {
             updates.plannedDeliveryDate = null;
+            updates.status = 'à planifier';
           }
-        } catch {
+        } else {
           updates.plannedDeliveryDate = null;
+          updates.status = 'à planifier';
         }
-      } else {
-        updates.plannedDeliveryDate = null;
-      }
 
-      useStore.getState().updateOrder(order.id, updates);
-      onSubmit();
+        updates.reference = editedOrder.reference;
+        updates.pallets = editedOrder.pallets;
+
+        useStore.getState().updateOrder(order.id, updates);
+        onSubmit();
+      }
     };
 
     return (

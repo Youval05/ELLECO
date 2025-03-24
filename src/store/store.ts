@@ -9,7 +9,8 @@ import {
   query,
   where,
   getDocs,
-  writeBatch
+  writeBatch,
+  Timestamp
 } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { Order, OrderStatus } from '../types/order';
@@ -39,6 +40,7 @@ export interface StoreState {
   deleteArchivedOrders: (criteria: 'all' | 'older-than-30-days' | 'older-than-90-days' | 'older-than-year') => Promise<number>;
   setUser: (name: string, type: 'preparateur' | 'commercial' | null) => void;
   reconnect: () => void;
+  checkOrdersToArchive: () => Promise<void>;
 }
 
 export const useStore = create<StoreState>()(
@@ -50,62 +52,107 @@ export const useStore = create<StoreState>()(
     syncError: null,
     lastSync: null,
 
-    initSync: () => {
+    checkOrdersToArchive: async () => {
       try {
-        console.log('Initialisation de la synchronisation avec Firestore');
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        yesterday.setHours(23, 59, 59, 999);
+
         const ordersRef = collection(db, 'orders');
+        const q = query(
+          ordersRef,
+          where('archived', '==', false),
+          where('plannedDeliveryDate', '<=', yesterday.toISOString())
+        );
+
+        const querySnapshot = await getDocs(q);
+        const batch = writeBatch(db);
+        let count = 0;
+
+        querySnapshot.forEach((doc) => {
+          const orderRef = doc.ref;
+          batch.update(orderRef, {
+            archived: true,
+            archivedAt: new Date().toISOString(),
+            status: 'archivée' as OrderStatus
+          });
+          count++;
+        });
+
+        if (count > 0) {
+          await batch.commit();
+          console.log(`${count} commandes archivées automatiquement`);
+        }
+      } catch (error) {
+        console.error('Erreur lors de l\'archivage automatique:', error);
+      }
+    },
+
+    initSync: () => {
+      const { checkOrdersToArchive } = get();
+      set({ syncStatus: 'syncing' });
+
+      try {
+        // Configuration de l'archivage automatique quotidien
+        const now = new Date();
+        const nextMidnight = new Date(now);
+        nextMidnight.setDate(nextMidnight.getDate() + 1);
+        nextMidnight.setHours(0, 0, 0, 0);
         
-        // Écoute des changements en temps réel
-        const unsubscribe = onSnapshot(ordersRef, 
+        const timeUntilMidnight = nextMidnight.getTime() - now.getTime();
+        
+        // Exécuter l'archivage immédiatement au démarrage
+        checkOrdersToArchive();
+        
+        // Configurer l'archivage automatique quotidien
+        const dailyArchiveInterval = setInterval(() => {
+          checkOrdersToArchive();
+        }, 24 * 60 * 60 * 1000); // 24 heures
+
+        // Première exécution à minuit
+        const initialTimeout = setTimeout(() => {
+          checkOrdersToArchive();
+        }, timeUntilMidnight);
+
+        // Configurer la synchronisation en temps réel
+        const ordersRef = collection(db, 'orders');
+        const unsubscribe = onSnapshot(
+          ordersRef,
           (snapshot) => {
-            const orders = snapshot.docs.map(doc => {
+            const orders: Order[] = [];
+            snapshot.forEach((doc) => {
               const data = doc.data();
-              
-              // Convertir les chaînes ISO en objets Date pour l'interface utilisateur
-              let plannedDeliveryDate = null;
-              if (data.plannedDeliveryDate) {
-                try {
-                  plannedDeliveryDate = new Date(data.plannedDeliveryDate);
-                  if (isNaN(plannedDeliveryDate.getTime())) {
-                    plannedDeliveryDate = null;
-                  }
-                } catch (e) {
-                  console.warn(`Date invalide pour la commande ${doc.id}:`, e);
-                  plannedDeliveryDate = null;
-                }
-              }
-              
-              return {
+              orders.push({
                 id: doc.id,
                 ...data,
-                plannedDeliveryDate
-              };
-            }) as Order[];
-            
-            set({ 
+                plannedDeliveryDate: data.plannedDeliveryDate ? new Date(data.plannedDeliveryDate) : null
+              } as Order);
+            });
+            set({
               orders,
               syncStatus: 'connected',
-              syncError: null,
-              lastSync: new Date()
+              lastSync: new Date(),
+              syncError: null
             });
-            
-            console.log(`Synchronisé ${orders.length} commandes depuis Firestore`);
-          }, 
+          },
           (error) => {
-            console.error('Erreur de synchronisation:', error);
-            set({ 
+            console.error('Erreur de synchronisation Firestore:', error);
+            set({
               syncStatus: 'error',
-              syncError: error.message || 'Erreur de connexion à la base de données'
+              syncError: error.message
             });
           }
         );
-        
-        // Retourner la fonction de nettoyage
-        return unsubscribe;
+
+        return () => {
+          unsubscribe();
+          clearInterval(dailyArchiveInterval);
+          clearTimeout(initialTimeout);
+        };
       } catch (error) {
         console.error('Erreur lors de l\'initialisation de la synchronisation:', error);
-        set({ 
-          syncStatus: 'error', 
+        set({
+          syncStatus: 'error',
           syncError: error instanceof Error ? error.message : 'Erreur inconnue'
         });
         return undefined;

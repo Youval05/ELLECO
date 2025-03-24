@@ -200,8 +200,32 @@ const CommercialDashboard = () => {
               console.log('New date value:', e.target.value);
               setEditedOrder({ ...editedOrder, plannedDeliveryDate: e.target.value });
             }}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base p-3"
           />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Nombre total de palettes
+          </label>
+          <div className="mt-1 flex items-center space-x-2">
+            <input
+              type="number"
+              min="0"
+              value={editedOrder.palletCount}
+              onChange={(e) => {
+                const count = parseInt(e.target.value) || 0;
+                const updatedPallets = handlePalletCountChange(count, editedOrder.pallets);
+                setEditedOrder({
+                  ...editedOrder,
+                  palletCount: e.target.value,
+                  pallets: updatedPallets
+                });
+              }}
+              className="block w-24 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base p-3"
+            />
+            <span className="text-sm text-gray-500">palettes</span>
+          </div>
         </div>
 
         <div>
@@ -211,7 +235,7 @@ const CommercialDashboard = () => {
           <select
             value={editedOrder.status}
             onChange={(e) => setEditedOrder({ ...editedOrder, status: e.target.value as OrderStatus })}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base p-3"
           >
             <option value="à planifier">À planifier</option>
             <option value="planifiée">Planifiée</option>
@@ -219,24 +243,6 @@ const CommercialDashboard = () => {
           </select>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium mb-1">Nombre de palettes</label>
-          <input
-            type="text"
-            className="w-full p-2 border rounded"
-            value={editedOrder.palletCount}
-            onChange={e => {
-              const count = parseInt(e.target.value) || 0;
-              const newPallets = handlePalletCountChange(count, editedOrder.pallets);
-              setEditedOrder({
-                ...editedOrder,
-                palletCount: e.target.value,
-                pallets: newPallets
-              });
-            }}
-          />
-        </div>
-        
         <div className="space-y-6">
           {editedOrder.pallets?.map((pallet: Pallet, index: number) => (
             <div key={index} className="border border-gray-200 p-3 rounded">

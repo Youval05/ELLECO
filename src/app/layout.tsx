@@ -14,13 +14,13 @@ const inter = Inter({ subsets: ['latin'] })
 // })
 
 export const metadata: Metadata = {
-  title: 'Base Parfaite',
-  description: 'Application de gestion des commandes',
+  title: 'Gestion Transport',
+  description: 'Application de gestion du transport',
   viewport: 'width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'Base Parfaite',
+    title: 'Gestion Transport',
   },
   formatDetection: {
     telephone: true,
@@ -42,8 +42,10 @@ export default function RootLayout({
         <link rel="manifest" href="/manifest.json" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="Delivery Manager" />
+        <meta name="apple-mobile-web-app-title" content="Gestion Transport" />
         <meta name="theme-color" content="#ffffff" />
+        <title>Gestion Transport</title>
+        <meta name="description" content="Application de gestion du transport" />
       </head>
       <body className={`${inter.className} bg-gray-50 safe-areas`}>
         <FirebaseMessageReplacer />

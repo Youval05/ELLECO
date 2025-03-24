@@ -1,11 +1,11 @@
 {
-  "name": "Delivery Manager",
-  "short_name": "Delivery",
-  "description": "Application de gestion des livraisons",
+  "name": "Gestion Transport",
+  "short_name": "Transport",
+  "description": "Application de gestion du transport",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#0070f3",
+  "theme_color": "#ffffff",
   "orientation": "portrait",
   "icons": [
     {

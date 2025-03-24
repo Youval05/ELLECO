@@ -159,33 +159,26 @@ export const useStore = create<StoreState>()(
       }
     },
 
-    addOrder: async (order) => {
-      console.log('Début de l\'ajout d\'une commande:', order);
+    addOrder: async (order: Partial<Order>) => {
       try {
-        set({ syncStatus: 'syncing' });
-        console.log('État de synchronisation mis à jour: syncing');
-        
+        const now = new Date();
         const ordersRef = collection(db, 'orders');
-        console.log('Collection orders récupérée');
         
-        const newOrder = {
+        // Utiliser "En attente" comme commercial par défaut
+        const orderData: FirestoreOrderUpdate = {
           ...order,
-          createdAt: new Date().toISOString(),
-          status: 'à planifier' as const,
+          commercial: order.commercial || 'En attente',
           version: 1,
-          lastModified: new Date().toISOString()
+          archived: false,
+          status: order.status || 'à planifier',
+          plannedDeliveryDate: order.plannedDeliveryDate?.toISOString() || null,
+          lastModified: now.toISOString()
         };
-        console.log('Nouvelle commande préparée:', newOrder);
-        
-        const docRef = await addDoc(ordersRef, newOrder);
-        console.log('Commande ajoutée avec succès, ID:', docRef.id);
-        
-        set({ syncStatus: 'connected', lastSync: new Date() });
-        console.log('État de synchronisation mis à jour: connected');
+
+        await addDoc(ordersRef, orderData);
       } catch (error) {
-        console.error('Erreur détaillée lors de l\'ajout:', error);
-        set({ syncStatus: 'offline' });
-        throw error; // Propager l'erreur pour la gestion d'erreur dans l'UI
+        console.error('Erreur lors de l\'ajout de la commande:', error);
+        throw error;
       }
     },
 

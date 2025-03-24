@@ -1,15 +1,13 @@
-import './globals.css';
+'use client';
+
 import { Inter } from 'next/font/google';
-import { Metadata } from 'next';
+import './globals.css';
+import ClientProvider from '@/components/ClientProvider';
+import AuthProvider from '@/components/AuthProvider';
+import FirebaseMessageReplacer from '@/components/FirebaseMessageReplacer';
+import FirebaseStatus from '@/components/FirebaseStatus';
 
 const inter = Inter({ subsets: ['latin'] });
-
-export const metadata: Metadata = {
-  title: 'Base Parfaite',
-  description: 'Application de gestion des commandes',
-  viewport: 'width=device-width, initial-scale=1, maximum-scale=1',
-  manifest: '/manifest.json',
-};
 
 export default function RootLayout({
   children,
@@ -18,8 +16,21 @@ export default function RootLayout({
 }) {
   return (
     <html lang="fr">
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+        <link rel="manifest" href="/manifest.json" />
+        <title>Base Parfaite</title>
+        <meta name="description" content="Application de gestion des commandes" />
+        <meta name="theme-color" content="#ffffff" />
+      </head>
       <body className={inter.className}>
-        {children}
+        <AuthProvider>
+          <ClientProvider>
+            <FirebaseMessageReplacer />
+            <FirebaseStatus />
+            {children}
+          </ClientProvider>
+        </AuthProvider>
       </body>
     </html>
   );

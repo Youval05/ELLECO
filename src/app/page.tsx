@@ -4,11 +4,7 @@ import { useState, useEffect } from 'react';
 import { useStore } from '../store/store';
 import CommercialDashboard from '../components/CommercialDashboard';
 import PreparateurDashboard from '../components/PreparateurDashboard';
-import ClientProvider from '../components/ClientProvider';
-import FirebaseStatus from '../components/FirebaseStatus';
-import AuthProvider from '../components/AuthProvider';
 import UserSelector from '../components/UserSelector';
-import FirebaseMessageReplacer from '../components/FirebaseMessageReplacer';
 
 const USERS = {
   preparateur: ['LENA', 'Johan', 'Préparateur1'],
@@ -50,43 +46,37 @@ export default function Home() {
   };
 
   return (
-    <ClientProvider>
-      <AuthProvider>
-        <FirebaseMessageReplacer />
-        <FirebaseStatus />
-        <div className="min-h-screen bg-gray-100">
-          <div className="container mx-auto px-4 py-8">
-            {!currentUser ? (
-              <UserSelector
-                selectedType={selectedType}
-                setSelectedType={setSelectedType}
-                users={USERS}
-                onSelectUser={handleSetUser}
-              />
-            ) : (
-              <>
-                <div className="flex justify-between items-center mb-8">
-                  <h1 className="text-2xl font-bold">
-                    {userType === 'preparateur' ? 'Dashboard Préparateur' : 'Dashboard Commercial'}
-                  </h1>
-                  <button
-                    onClick={handleReset}
-                    className="text-sm text-gray-600 hover:text-gray-900"
-                  >
-                    Déconnexion
-                  </button>
-                </div>
+    <div className="min-h-screen bg-gray-100">
+      <div className="container mx-auto px-4 py-8">
+        {!currentUser ? (
+          <UserSelector
+            selectedType={selectedType}
+            setSelectedType={setSelectedType}
+            users={USERS}
+            onSelectUser={handleSetUser}
+          />
+        ) : (
+          <>
+            <div className="flex justify-between items-center mb-8">
+              <h1 className="text-2xl font-bold">
+                {userType === 'preparateur' ? 'Dashboard Préparateur' : 'Dashboard Commercial'}
+              </h1>
+              <button
+                onClick={handleReset}
+                className="text-sm text-gray-600 hover:text-gray-900"
+              >
+                Déconnexion
+              </button>
+            </div>
 
-                {userType === 'preparateur' ? (
-                  <PreparateurDashboard />
-                ) : (
-                  <CommercialDashboard />
-                )}
-              </>
+            {userType === 'preparateur' ? (
+              <PreparateurDashboard />
+            ) : (
+              <CommercialDashboard />
             )}
-          </div>
-        </div>
-      </AuthProvider>
-    </ClientProvider>
+          </>
+        )}
+      </div>
+    </div>
   );
 }

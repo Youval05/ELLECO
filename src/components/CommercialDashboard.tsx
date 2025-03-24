@@ -399,9 +399,10 @@ const CommercialDashboard = () => {
                         Réf: {order.reference || 'N/A'}
                       </p>
                       <p className="text-sm text-gray-600">
-                        Date: {order.plannedDeliveryDate 
-                          ? new Date(order.plannedDeliveryDate).toLocaleDateString() 
-                          : 'Non planifiée'}
+                        Date de livraison : {order.plannedDeliveryDate ? new Date(order.plannedDeliveryDate).toLocaleDateString() : 'Non planifiée'}
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        Nombre de palettes : {order.pallets?.length || 0}
                       </p>
                       <div className="mt-1">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${

@@ -89,7 +89,6 @@ const PreparateurDashboard = () => {
 
   const [newOrder, setNewOrder] = useState({
     clientName: '',
-    commercial: 'En attente',
     reference: '',
     palletCount: '',
     pallets: [{ ...DEFAULT_PALLET }]
@@ -114,14 +113,13 @@ const PreparateurDashboard = () => {
     useStore.getState().addOrder({
       client: newOrder.clientName,
       clientName: newOrder.clientName,
-      commercial: newOrder.commercial,
+      commercial: 'En attente',
       reference: newOrder.reference,
       preparateur: currentUser,
       pallets: newOrder.pallets,
     });
     setNewOrder({
       clientName: '',
-      commercial: 'En attente',
       reference: '',
       palletCount: '',
       pallets: [{ ...DEFAULT_PALLET }]
@@ -542,7 +540,6 @@ const PreparateurDashboard = () => {
               onClick={() => {
                 setNewOrder({
                   clientName: '',
-                  commercial: 'En attente',
                   reference: '',
                   palletCount: '',
                   pallets: [{ ...DEFAULT_PALLET }]
@@ -570,21 +567,6 @@ const PreparateurDashboard = () => {
                     onChange={e => setNewOrder({ ...newOrder, clientName: e.target.value })}
                     required
                   />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Commercial</label>
-                  <select
-                    className="w-full p-3 border border-gray-300 rounded-lg text-base"
-                    value={newOrder.commercial}
-                    onChange={e => setNewOrder({ ...newOrder, commercial: e.target.value })}
-                    required
-                  >
-                    {COMMERCIALS.map(commercial => (
-                      <option key={commercial} value={commercial}>
-                        {commercial}
-                      </option>
-                    ))}
-                  </select>
                 </div>
               </div>
 
@@ -695,7 +677,6 @@ const PreparateurDashboard = () => {
                   onClick={() => {
                     setNewOrder({
                       clientName: '',
-                      commercial: 'En attente',
                       reference: '',
                       palletCount: '',
                       pallets: [{ ...DEFAULT_PALLET }]

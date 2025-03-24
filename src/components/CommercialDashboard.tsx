@@ -98,9 +98,8 @@ const CommercialDashboard = () => {
     return pallets.slice(0, count);
   };
 
-  // Filtrer les commandes pour n'afficher que celles du commercial connecté et qui ne sont pas archivées
+  // Filtrer les commandes pour n'afficher que celles qui ne sont pas archivées
   const myOrders = allOrders
-    .filter(order => order.commercial === currentUser)
     .filter(order => !order.archived)
     .map(order => convertLegacyOrder(order));
 

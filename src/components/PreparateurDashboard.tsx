@@ -441,6 +441,9 @@ const PreparateurDashboard = () => {
                       <p className="text-sm text-gray-600">
                         Date de chargement prévu : {order.plannedDeliveryDate ? new Date(order.plannedDeliveryDate).toLocaleDateString() : 'Non planifié'}
                       </p>
+                      <p className="text-sm text-gray-600">
+                        Nombre de palettes : {order.pallets?.length || 0} | Poids total : {order.pallets?.reduce((total, pallet) => total + (pallet.weight || 0), 0)} kg
+                      </p>
                     </div>
                     <div className="flex flex-row sm:flex-col space-x-2 sm:space-x-0 sm:space-y-2 w-full sm:w-auto">
                       <button

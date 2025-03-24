@@ -1,8 +1,47 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if true;
+    // Fonction pour vérifier si l'utilisateur est authentifié
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Fonction pour vérifier si l'utilisateur est un préparateur
+    function isPreparateur() {
+      return isAuthenticated() && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'preparateur';
+    }
+
+    // Fonction pour vérifier si l'utilisateur est un commercial
+    function isCommercial() {
+      return isAuthenticated() && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'commercial';
+    }
+
+    // Règles pour la collection orders
+    match /orders/{orderId} {
+      // Lecture : utilisateurs authentifiés uniquement
+      allow read: if isAuthenticated();
+      
+      // Création : préparateurs et commerciaux uniquement
+      allow create: if isPreparateur() || isCommercial();
+      
+      // Mise à jour : préparateurs uniquement
+      allow update: if isPreparateur();
+      
+      // Suppression : préparateurs uniquement
+      allow delete: if isPreparateur();
+    }
+
+    // Règles pour la collection users
+    match /users/{userId} {
+      // Lecture : utilisateurs authentifiés uniquement
+      allow read: if isAuthenticated();
+      
+      // Écriture : administrateur uniquement (à gérer via Firebase Console)
+      allow write: if false;
     }
   }
 }

@@ -13,6 +13,10 @@ export default function UserSelector() {
     setCurrentUser({ name, role })
   }
 
+  const handleLogout = () => {
+    setCurrentUser(null)
+  }
+
   return (
     <div className="w-full max-w-md mx-auto p-4">
       <h2 className="text-xl font-semibold mb-4">Sélectionnez votre profil</h2>
@@ -56,6 +60,13 @@ export default function UserSelector() {
           </div>
         </div>
       </div>
+      <button
+        type="button"
+        onClick={handleLogout}
+        className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+      >
+        Se déconnecter
+      </button>
     </div>
   )
 }

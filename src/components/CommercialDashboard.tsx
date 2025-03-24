@@ -404,6 +404,9 @@ const CommercialDashboard = () => {
                       <p className="text-sm text-gray-600">
                         Nombre de palettes : {order.pallets?.length || 0} | Poids total : {order.pallets?.reduce((total, pallet) => total + (pallet.weight || 0), 0)} kg
                       </p>
+                      <p className="text-sm text-gray-600">
+                        Préparateur : {order.preparateur || 'Non assigné'}
+                      </p>
                       <div className="mt-1">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                           order.status === 'à planifier' ? 'bg-yellow-100 text-yellow-800' :

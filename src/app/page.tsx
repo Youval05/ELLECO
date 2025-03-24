@@ -11,7 +11,7 @@ import UserSelector from '../components/UserSelector';
 import FirebaseMessageReplacer from '../components/FirebaseMessageReplacer';
 
 const USERS = {
-  preparateur: ['Bryan', 'Muriel'],
+  preparateur: ['LENA', 'Johan', 'Préparateur1', 'Bryan', 'Muriel'],
   commercial: ['Jordan', 'Jérôme', 'Rudy', 'Carlo']
 } as const;
 

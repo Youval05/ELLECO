@@ -11,8 +11,8 @@ import UserSelector from '../components/UserSelector';
 import FirebaseMessageReplacer from '../components/FirebaseMessageReplacer';
 
 const USERS = {
-  preparateur: ['LENA', 'Johan', 'Préparateur1', 'Bryan', 'Muriel'],
-  commercial: ['Jordan', 'Jérôme', 'Rudy', 'Carlo']
+  preparateur: ['LENA', 'Johan', 'Préparateur1'],
+  commercial: ['en attente', 'Youval', 'Betsalel']
 } as const;
 
 type UserType = 'preparateur' | 'commercial' | null;
@@ -24,7 +24,6 @@ export default function Home() {
   // Initialiser la synchronisation avec Firestore au chargement de la page
   useEffect(() => {
     console.log('Initialisation de la synchronisation...');
-    // Utilisation d'un try-catch pour éviter que les erreurs ne bloquent le rendu
     try {
       const unsubscribe = initSync();
       console.log('Synchronisation initialisée avec succès');
@@ -37,10 +36,9 @@ export default function Home() {
       };
     } catch (error) {
       console.error('Erreur lors de l\'initialisation de Firestore:', error);
-      // Ne pas bloquer le rendu en cas d'erreur
       return () => {};
     }
-  }, [initSync]); // Ajouter initSync aux dépendances
+  }, [initSync]);
 
   const handleSetUser = (user: string, type: UserType) => {
     setUser(user, type);
@@ -56,84 +54,38 @@ export default function Home() {
       <AuthProvider>
         <FirebaseMessageReplacer />
         <FirebaseStatus />
-        {!selectedType && !userType ? (
-          <div className="min-h-screen bg-gray-100 py-8 px-4 sm:py-12 sm:px-6 lg:px-8 pt-safe pb-safe">
-            <div className="max-w-md mx-auto">
-              <div className="text-center mb-6 sm:mb-8">
-                <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
-                  Sélectionnez votre profil
-                </h2>
-              </div>
-              <div className="bg-white shadow rounded-lg">
-                <div className="px-4 py-5 sm:p-6">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <button
-                      onClick={() => setSelectedType('preparateur')}
-                      className="bg-blue-50 hover:bg-blue-100 text-blue-700 font-semibold py-6 sm:py-8 px-4 rounded-lg border-2 border-blue-200 transition-colors duration-200 flex items-center justify-center"
-                    >
-                      <span>Préparateur</span>
-                    </button>
-                    <button
-                      onClick={() => setSelectedType('commercial')}
-                      className="bg-green-50 hover:bg-green-100 text-green-700 font-semibold py-6 sm:py-8 px-4 rounded-lg border-2 border-green-200 transition-colors duration-200 flex items-center justify-center"
-                    >
-                      <span>Commercial</span>
-                    </button>
-                  </div>
+        <div className="min-h-screen bg-gray-100">
+          <div className="container mx-auto px-4 py-8">
+            {!currentUser ? (
+              <UserSelector
+                selectedType={selectedType}
+                setSelectedType={setSelectedType}
+                users={USERS}
+                onSelectUser={handleSetUser}
+              />
+            ) : (
+              <>
+                <div className="flex justify-between items-center mb-8">
+                  <h1 className="text-2xl font-bold">
+                    {userType === 'preparateur' ? 'Dashboard Préparateur' : 'Dashboard Commercial'}
+                  </h1>
+                  <button
+                    onClick={handleReset}
+                    className="text-sm text-gray-600 hover:text-gray-900"
+                  >
+                    Déconnexion
+                  </button>
                 </div>
-              </div>
-            </div>
+
+                {userType === 'preparateur' ? (
+                  <PreparateurDashboard />
+                ) : (
+                  <CommercialDashboard />
+                )}
+              </>
+            )}
           </div>
-        ) : !currentUser ? (
-          <div className="min-h-screen bg-gray-100 py-8 px-4 sm:py-12 sm:px-6 lg:px-8 pt-safe pb-safe">
-            <div className="max-w-md mx-auto">
-              <div className="text-center mb-6 sm:mb-8">
-                <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
-                  Sélectionnez votre nom
-                </h2>
-                <button
-                  onClick={handleReset}
-                  className="mt-2 text-sm text-gray-500 hover:text-gray-700"
-                >
-                  ← Retour à la sélection du profil
-                </button>
-              </div>
-              <div className="bg-white shadow rounded-lg">
-                <div className="px-4 py-5 sm:p-6">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {selectedType === 'preparateur' ? USERS.preparateur.map(user => (
-                      <button
-                        key={user}
-                        onClick={() => handleSetUser(user, selectedType)}
-                        className="bg-blue-50 hover:bg-blue-100 text-blue-700 font-semibold py-4 px-4 rounded-lg border-2 border-blue-200 transition-colors duration-200 flex items-center justify-center"
-                      >
-                        {user}
-                      </button>
-                    )) : USERS.commercial.map(user => (
-                      <button
-                        key={user}
-                        onClick={() => handleSetUser(user, selectedType)}
-                        className="bg-green-50 hover:bg-green-100 text-green-700 font-semibold py-4 px-4 rounded-lg border-2 border-green-200 transition-colors duration-200 flex items-center justify-center"
-                      >
-                        {user}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <main className="min-h-screen bg-gray-50">
-            {userType === 'preparateur' ? <PreparateurDashboard /> : <CommercialDashboard />}
-            <button
-              onClick={handleReset}
-              className="text-gray-500 hover:text-gray-700 text-sm sm:text-base"
-            >
-              Déconnexion
-            </button>
-          </main>
-        )}
+        </div>
       </AuthProvider>
     </ClientProvider>
   );

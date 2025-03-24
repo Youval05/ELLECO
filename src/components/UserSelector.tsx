@@ -1,72 +1,89 @@
-import { useUserStore } from '../utils/store'
-import type { UserRole } from '../utils/store'
+'use client';
 
-const USERS = {
-  preparateurs: ['Bryan', 'Muriel'],
-  commerciaux: ['Rudy', 'Carlo', 'Jérôme'],
+import { Dispatch, SetStateAction } from 'react';
+
+type UserType = 'preparateur' | 'commercial' | null;
+
+interface UserSelectorProps {
+  selectedType: UserType;
+  setSelectedType: Dispatch<SetStateAction<UserType>>;
+  users: {
+    preparateur: readonly string[];
+    commercial: readonly string[];
+  };
+  onSelectUser: (user: string, type: UserType) => void;
 }
 
-export default function UserSelector() {
-  const { currentUser, setCurrentUser } = useUserStore()
+const USERS = {
+  preparateur: ['Bryan', 'Muriel'],
+  commercial: ['Rudy', 'Carlo', 'Jérôme'],
+}
 
-  const handleUserSelect = (name: string, role: UserRole) => {
-    setCurrentUser({ name, role })
-  }
-
-  const handleLogout = () => {
-    setCurrentUser(null)
-  }
-
+export default function UserSelector({ selectedType, setSelectedType, users = USERS, onSelectUser }: UserSelectorProps) {
   return (
-    <div className="w-full max-w-md mx-auto p-4">
-      <h2 className="text-xl font-semibold mb-4">Sélectionnez votre profil</h2>
-      
-      <div className="space-y-6">
-        <div>
-          <h3 className="text-lg font-medium mb-2">Préparateurs</h3>
-          <div className="grid grid-cols-2 gap-2">
-            {USERS.preparateurs.map((name) => (
+    <div className="min-h-screen bg-gray-100 py-8 px-4 sm:py-12 sm:px-6 lg:px-8 pt-safe pb-safe">
+      <div className="max-w-md mx-auto">
+        {!selectedType ? (
+          <>
+            <div className="text-center mb-6 sm:mb-8">
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
+                Sélectionnez votre profil
+              </h2>
+            </div>
+            <div className="bg-white shadow rounded-lg">
+              <div className="px-4 py-5 sm:p-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <button
+                    onClick={() => setSelectedType('preparateur')}
+                    className="bg-blue-50 hover:bg-blue-100 text-blue-700 font-semibold py-6 sm:py-8 px-4 rounded-lg border-2 border-blue-200 transition-colors duration-200 flex items-center justify-center"
+                  >
+                    <span>Préparateur</span>
+                  </button>
+                  <button
+                    onClick={() => setSelectedType('commercial')}
+                    className="bg-green-50 hover:bg-green-100 text-green-700 font-semibold py-6 sm:py-8 px-4 rounded-lg border-2 border-green-200 transition-colors duration-200 flex items-center justify-center"
+                  >
+                    <span>Commercial</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="text-center mb-6 sm:mb-8">
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
+                Sélectionnez votre nom
+              </h2>
               <button
-                key={name}
-                onClick={() => handleUserSelect(name, 'preparateur')}
-                className={`p-3 rounded-lg border transition-colors ${
-                  currentUser?.name === name
-                    ? 'bg-primary text-white border-primary'
-                    : 'border-gray-300 hover:border-primary'
-                }`}
+                onClick={() => setSelectedType(null)}
+                className="mt-2 text-sm text-gray-500 hover:text-gray-700"
               >
-                {name}
+                ← Retour à la sélection du profil
               </button>
-            ))}
-          </div>
-        </div>
-
-        <div>
-          <h3 className="text-lg font-medium mb-2">Commerciaux</h3>
-          <div className="grid grid-cols-2 gap-2">
-            {USERS.commerciaux.map((name) => (
-              <button
-                key={name}
-                onClick={() => handleUserSelect(name, 'commercial')}
-                className={`p-3 rounded-lg border transition-colors ${
-                  currentUser?.name === name
-                    ? 'bg-primary text-white border-primary'
-                    : 'border-gray-300 hover:border-primary'
-                }`}
-              >
-                {name}
-              </button>
-            ))}
-          </div>
-        </div>
+            </div>
+            <div className="bg-white shadow rounded-lg">
+              <div className="px-4 py-5 sm:p-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {users[selectedType].map(user => (
+                    <button
+                      key={user}
+                      onClick={() => onSelectUser(user, selectedType)}
+                      className={`${
+                        selectedType === 'preparateur'
+                          ? 'bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200'
+                          : 'bg-green-50 hover:bg-green-100 text-green-700 border-green-200'
+                      } font-semibold py-4 px-4 rounded-lg border-2 transition-colors duration-200 flex items-center justify-center`}
+                    >
+                      {user}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </>
+        )}
       </div>
-      <button
-        type="button"
-        onClick={handleLogout}
-        className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-      >
-        Se déconnecter
-      </button>
     </div>
-  )
+  );
 }

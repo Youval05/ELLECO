@@ -10,7 +10,7 @@ import AuthForm from '../components/AuthForm';
 
 const USERS = {
   preparateur: ['Bryan', 'Muriel', 'Lena', 'Johan'],
-  commercial: ['Jordan', 'Jérôme', 'Rudy', 'Carlo']
+  commercial: ['commercial']
 } as const;
 
 type UserType = 'preparateur' | 'commercial' | null;
@@ -43,7 +43,11 @@ export default function Home() {
   };
 
   const handleSetUser = (user: string, type: UserType) => {
-    setUser(user, type);
+    if (type === 'commercial') {
+      setUser('commercial', type);
+    } else {
+      setUser(user, type);
+    }
   };
 
   const handleReset = () => {
@@ -118,15 +122,12 @@ export default function Home() {
                       </>
                     ) : (
                       <>
-                        {USERS.commercial.map(user => (
-                          <button
-                            key={user}
-                            onClick={() => handleSetUser(user, selectedType)}
-                            className="bg-green-50 hover:bg-green-100 text-green-700 font-semibold py-4 px-4 rounded-lg border-2 border-green-200 transition-colors duration-200"
-                          >
-                            {user}
-                          </button>
-                        ))}
+                        <button
+                          onClick={() => handleSetUser('commercial', selectedType)}
+                          className="bg-green-50 hover:bg-green-100 text-green-700 font-semibold py-4 px-4 rounded-lg border-2 border-green-200 transition-colors duration-200"
+                        >
+                          Commercial
+                        </button>
                       </>
                     )}
                   </div>

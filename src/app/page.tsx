@@ -9,7 +9,7 @@ import FirebaseStatus from '../components/FirebaseStatus';
 import AuthForm from '../components/AuthForm';
 
 const USERS = {
-  preparateur: ['Bryan', 'Muriel'],
+  preparateur: ['Bryan', 'Muriel', 'Lena', 'Johan'],
   commercial: ['Jordan', 'Jérôme', 'Rudy', 'Carlo']
 } as const;
 

@@ -16,7 +16,10 @@ interface FormData {
   address: string;
   products: string[];
   comments: string;
+  commercial: string;
 }
+
+const COMMERCIALS = ['En attente', 'Jordan', 'Jérôme', 'Rudy', 'Carlo'];
 
 const OrderForm = ({ mode, initialOrder, onClose }: OrderFormProps) => {
   const { addOrder, updateOrder } = useStore();
@@ -27,7 +30,8 @@ const OrderForm = ({ mode, initialOrder, onClose }: OrderFormProps) => {
     client: initialOrderWithConverter?.client || '',
     address: initialOrderWithConverter?.address || '',
     products: initialOrderWithConverter?.products || [],
-    comments: initialOrderWithConverter?.comments || ''
+    comments: initialOrderWithConverter?.comments || '',
+    commercial: initialOrderWithConverter?.commercial || 'En attente'
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -37,7 +41,8 @@ const OrderForm = ({ mode, initialOrder, onClose }: OrderFormProps) => {
       client: formData.client,
       address: formData.address,
       products: formData.products,
-      comments: formData.comments
+      comments: formData.comments,
+      commercial: formData.commercial
     };
 
     if (mode === 'create') {
@@ -76,6 +81,22 @@ const OrderForm = ({ mode, initialOrder, onClose }: OrderFormProps) => {
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
               required
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Commercial</label>
+            <select
+              value={formData.commercial}
+              onChange={(e) => setFormData({ ...formData, commercial: e.target.value })}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+              required
+            >
+              {COMMERCIALS.map(commercial => (
+                <option key={commercial} value={commercial}>
+                  {commercial}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div>

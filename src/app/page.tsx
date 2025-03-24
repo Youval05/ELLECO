@@ -10,7 +10,7 @@ import AuthForm from '../components/AuthForm';
 
 const USERS = {
   preparateur: ['Bryan', 'Muriel', 'Lena', 'Johan'],
-  commercial: ['En attente', 'Jordan', 'Jérôme', 'Rudy', 'Carlo']
+  commercial: ['Jordan', 'Jérôme', 'Rudy', 'Carlo']
 } as const;
 
 type UserType = 'preparateur' | 'commercial' | null;

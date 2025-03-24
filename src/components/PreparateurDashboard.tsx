@@ -7,7 +7,6 @@ import { Order, OrderStatus, Pallet } from '../types/order';
 import Link from 'next/link';
 
 const PALLET_DIMENSIONS = ['60x40', '80x120', '100x120'] as const;
-const COMMERCIALS = ['En attente', 'Jordan', 'Jérôme', 'Rudy', 'Carlo'] as const;
 
 const DEFAULT_PALLET: Pallet = {
   dimensions: '80x120',
@@ -113,7 +112,6 @@ const PreparateurDashboard = () => {
     useStore.getState().addOrder({
       client: newOrder.clientName,
       clientName: newOrder.clientName,
-      commercial: 'En attente',
       reference: newOrder.reference,
       preparateur: currentUser,
       pallets: newOrder.pallets,
@@ -141,7 +139,7 @@ const PreparateurDashboard = () => {
       // Filtrer par recherche
       const matchesSearch = searchTerm === '' || 
         order.clientName?.toLowerCase().includes(searchTerm.toLowerCase()) || 
-        order.commercial?.toLowerCase().includes(searchTerm.toLowerCase());
+        order.reference?.toLowerCase().includes(searchTerm.toLowerCase());
       return matchesSearch;
     });
 
@@ -442,7 +440,6 @@ const PreparateurDashboard = () => {
                           {order.status}
                         </span>
                       </div>
-                      <p className="text-gray-600 text-sm">Commercial: {order.commercial || 'Non défini'}</p>
                       <p className="text-gray-600 text-sm">Référence: {order.reference || 'Non définie'}</p>
                       <p className={`text-sm
                         ${order.status === 'à planifier' ? 'text-yellow-600' : ''}

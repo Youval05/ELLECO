@@ -7,6 +7,7 @@ import { Order, OrderStatus, Pallet } from '../types/order';
 import Link from 'next/link';
 
 const PALLET_DIMENSIONS = ['60x40', '80x120', '100x120'] as const;
+const COMMERCIALS = ['En attente', 'Jordan', 'Jérôme', 'Rudy', 'Carlo'] as const;
 
 const DEFAULT_PALLET: Pallet = {
   dimensions: '80x120',
@@ -88,7 +89,7 @@ const PreparateurDashboard = () => {
 
   const [newOrder, setNewOrder] = useState({
     clientName: '',
-    commercial: '',
+    commercial: 'En attente',
     reference: '',
     palletCount: '',
     pallets: [{ ...DEFAULT_PALLET }]
@@ -120,7 +121,7 @@ const PreparateurDashboard = () => {
     });
     setNewOrder({
       clientName: '',
-      commercial: '',
+      commercial: 'En attente',
       reference: '',
       palletCount: '',
       pallets: [{ ...DEFAULT_PALLET }]
@@ -240,7 +241,7 @@ const PreparateurDashboard = () => {
               console.log('New date value:', e.target.value);
               setEditedOrder({ ...editedOrder, plannedDeliveryDate: e.target.value });
             }}
-            className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base p-3"
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base p-3"
           />
         </div>
 
@@ -251,7 +252,7 @@ const PreparateurDashboard = () => {
           <select
             value={editedOrder.status}
             onChange={(e) => setEditedOrder({ ...editedOrder, status: e.target.value as OrderStatus })}
-            className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base p-3"
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base p-3"
           >
             <option value="à planifier">À planifier</option>
             <option value="planifiée">Planifiée</option>
@@ -541,7 +542,7 @@ const PreparateurDashboard = () => {
               onClick={() => {
                 setNewOrder({
                   clientName: '',
-                  commercial: '',
+                  commercial: 'En attente',
                   reference: '',
                   palletCount: '',
                   pallets: [{ ...DEFAULT_PALLET }]
@@ -571,30 +572,30 @@ const PreparateurDashboard = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Référence</label>
-                  <input
-                    type="text"
+                  <label className="block text-sm font-medium mb-1">Commercial</label>
+                  <select
                     className="w-full p-3 border border-gray-300 rounded-lg text-base"
-                    value={newOrder.reference}
-                    onChange={e => setNewOrder({ ...newOrder, reference: e.target.value })}
-                  />
+                    value={newOrder.commercial}
+                    onChange={e => setNewOrder({ ...newOrder, commercial: e.target.value })}
+                    required
+                  >
+                    {COMMERCIALS.map(commercial => (
+                      <option key={commercial} value={commercial}>
+                        {commercial}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
               <div className="mb-4">
-                <label className="block text-sm font-medium mb-1">Commercial</label>
-                <select
+                <label className="block text-sm font-medium mb-1">Référence</label>
+                <input
+                  type="text"
                   className="w-full p-3 border border-gray-300 rounded-lg text-base"
-                  value={newOrder.commercial}
-                  onChange={e => setNewOrder({ ...newOrder, commercial: e.target.value })}
-                  required
-                >
-                  <option value="">Sélectionner un commercial</option>
-                  <option value="Jordan">Jordan</option>
-                  <option value="Jérôme">Jérôme</option>
-                  <option value="Rudy">Rudy</option>
-                  <option value="Carlo">Carlo</option>
-                </select>
+                  value={newOrder.reference}
+                  onChange={e => setNewOrder({ ...newOrder, reference: e.target.value })}
+                />
               </div>
 
               <div className="mb-4">
@@ -694,7 +695,7 @@ const PreparateurDashboard = () => {
                   onClick={() => {
                     setNewOrder({
                       clientName: '',
-                      commercial: '',
+                      commercial: 'En attente',
                       reference: '',
                       palletCount: '',
                       pallets: [{ ...DEFAULT_PALLET }]

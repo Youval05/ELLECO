@@ -228,7 +228,7 @@ const PreparateurDashboard = () => {
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Date de livraison prévue
+            Date de chargement prévu
           </label>
           <input
             type="date"
@@ -441,29 +441,8 @@ const PreparateurDashboard = () => {
                         </span>
                       </div>
                       <p className="text-gray-600 text-sm">Référence: {order.reference || 'Non définie'}</p>
-                      <p className={`text-sm
-                        ${order.status === 'à planifier' ? 'text-yellow-600' : ''}
-                        ${order.status === 'planifiée' ? 'text-blue-600' : ''}
-                        ${order.status === 'livrée' ? 'text-green-600' : ''}
-                      `}>
-                        Date de livraison: {order.plannedDeliveryDate 
-                          ? (() => {
-                              try {
-                                const date = new Date(order.plannedDeliveryDate);
-                                if (!isNaN(date.getTime())) {
-                                  return date.toLocaleDateString('fr-FR', {
-                                    day: '2-digit',
-                                    month: '2-digit',
-                                    year: '2-digit'
-                                  });
-                                }
-                                return 'Non planifiée';
-                              } catch (error) {
-                                console.error('Error formatting display date:', error);
-                                return 'Non planifiée';
-                              }
-                            })()
-                          : 'Non planifiée'}
+                      <p className="text-sm text-gray-600">
+                        Date de chargement prévu : {order.plannedDeliveryDate ? new Date(order.plannedDeliveryDate).toLocaleDateString() : 'Non planifié'}
                       </p>
                     </div>
                     <div className="flex flex-row sm:flex-col space-x-2 sm:space-x-0 sm:space-y-2 w-full sm:w-auto">

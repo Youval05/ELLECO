@@ -186,7 +186,7 @@ const CommercialDashboard = () => {
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Date de livraison prévue
+            Date de chargement prévu
           </label>
           <input
             type="date"
@@ -394,7 +394,7 @@ const CommercialDashboard = () => {
                         Réf: {order.reference || 'N/A'}
                       </p>
                       <p className="text-sm text-gray-600">
-                        Date de livraison : {order.plannedDeliveryDate ? new Date(order.plannedDeliveryDate).toLocaleDateString() : 'Non planifiée'}
+                        Date de chargement prévu : {order.plannedDeliveryDate ? new Date(order.plannedDeliveryDate).toLocaleDateString() : 'Non planifié'}
                       </p>
                       <p className="text-sm text-gray-600">
                         Nombre de palettes : {order.pallets?.length || 0} | Poids total : {order.pallets?.reduce((total, pallet) => total + (pallet.weight || 0), 0)} kg

@@ -79,7 +79,7 @@ const ArchiveDashboard = () => {
             >
               <option value="all">Tous les statuts</option>
               <option value="à planifier">À planifier</option>
-              <option value="planifiée">Planifiée</option>
+              <option value="confirmée">Confirmée</option>
               <option value="livrée">Livrée</option>
               <option value="archivée">Archivée</option>
             </select>
@@ -150,11 +150,12 @@ const ArchiveDashboard = () => {
                 <div>
                   <div className="flex items-center gap-3 mb-2">
                     <h3 className="text-lg font-semibold">{order.clientName}</h3>
-                    <span className={`px-3 py-1 rounded-full text-sm font-medium
-                      ${order.status === 'à planifier' ? 'bg-yellow-100 text-yellow-800' : ''}
-                      ${order.status === 'planifiée' ? 'bg-blue-100 text-blue-800' : ''}
-                      ${order.status === 'livrée' ? 'bg-green-100 text-green-800' : ''}
-                    `}>
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                      order.status === 'à planifier' ? 'bg-yellow-100 text-yellow-800' :
+                      order.status === 'confirmée' ? 'bg-green-100 text-green-800' :
+                      order.status === 'livrée' ? 'bg-blue-100 text-blue-800' :
+                      'bg-gray-100 text-gray-800'
+                    }`}>
                       {order.status}
                     </span>
                     <span className="px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800">
@@ -165,8 +166,8 @@ const ArchiveDashboard = () => {
                   <p className="text-gray-600">Référence: {order.reference || 'Non définie'}</p>
                   <p className={`
                     ${order.status === 'à planifier' ? 'text-yellow-600' : ''}
-                    ${order.status === 'planifiée' ? 'text-blue-600' : ''}
-                    ${order.status === 'livrée' ? 'text-green-600' : ''}
+                    ${order.status === 'confirmée' ? 'text-green-600' : ''}
+                    ${order.status === 'livrée' ? 'text-blue-600' : ''}
                   `}>
                     Date de livraison: {order.plannedDeliveryDate 
                       ? (() => {

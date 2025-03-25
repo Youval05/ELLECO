@@ -164,7 +164,7 @@ const CommercialDashboard = () => {
             const date = new Date(editedOrder.plannedDeliveryDate);
             if (!isNaN(date.getTime())) {
               updates.plannedDeliveryDate = date;
-              updates.status = 'planifiée';
+              updates.status = 'confirmée';
             }
           } catch {
             updates.plannedDeliveryDate = null;
@@ -305,7 +305,7 @@ const CommercialDashboard = () => {
             >
               <option value="all">Tous les statuts</option>
               <option value="à planifier">À planifier</option>
-              <option value="planifiée">Planifiée</option>
+              <option value="confirmée">Confirmée</option>
               <option value="livrée">Livrée</option>
             </select>
           </div>
@@ -336,11 +336,11 @@ const CommercialDashboard = () => {
                       <div className="mt-1">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                           order.status === 'à planifier' ? 'bg-yellow-100 text-yellow-800' :
-                          order.status === 'planifiée' ? 'bg-blue-100 text-blue-800' :
-                          order.status === 'livrée' ? 'bg-green-100 text-green-800' :
+                          order.status === 'confirmée' ? 'bg-green-100 text-green-800' :
+                          order.status === 'livrée' ? 'bg-blue-100 text-blue-800' :
                           'bg-gray-100 text-gray-800'
                         }`}>
-                          {order.status || 'Inconnu'}
+                          {order.status}
                         </span>
                       </div>
                     </div>

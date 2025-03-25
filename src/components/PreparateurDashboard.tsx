@@ -192,7 +192,7 @@ const PreparateurDashboard = () => {
             const date = new Date(editedOrder.plannedDeliveryDate);
             if (!isNaN(date.getTime())) {
               updates.plannedDeliveryDate = date;
-              updates.status = 'planifiée';
+              updates.status = 'confirmée';
             }
           } catch {
             updates.plannedDeliveryDate = null;
@@ -251,7 +251,7 @@ const PreparateurDashboard = () => {
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base p-3"
           >
             <option value="à planifier">À planifier</option>
-            <option value="planifiée">Planifiée</option>
+            <option value="confirmée">Confirmée</option>
             <option value="livrée">Livrée</option>
           </select>
         </div>
@@ -419,7 +419,7 @@ const PreparateurDashboard = () => {
             >
               <option value="all">Tous les statuts</option>
               <option value="à planifier">À planifier</option>
-              <option value="planifiée">Planifiée</option>
+              <option value="confirmée">Confirmée</option>
               <option value="livrée">Livrée</option>
             </select>
             <input
@@ -444,11 +444,12 @@ const PreparateurDashboard = () => {
                     <div className="w-full sm:w-auto">
                       <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
                         <h3 className="text-lg font-semibold">{order.clientName || 'Client sans nom'}</h3>
-                        <span className={`px-3 py-1 rounded-full text-sm font-medium inline-block
-                          ${order.status === 'à planifier' ? 'bg-yellow-100 text-yellow-800' : ''}
-                          ${order.status === 'planifiée' ? 'bg-blue-100 text-blue-800' : ''}
-                          ${order.status === 'livrée' ? 'bg-green-100 text-green-800' : ''}
-                        `}>
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          order.status === 'à planifier' ? 'bg-yellow-100 text-yellow-800' :
+                          order.status === 'confirmée' ? 'bg-green-100 text-green-800' :
+                          order.status === 'livrée' ? 'bg-blue-100 text-blue-800' :
+                          'bg-gray-100 text-gray-800'
+                        }`}>
                           {order.status}
                         </span>
                       </div>

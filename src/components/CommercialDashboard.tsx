@@ -117,18 +117,6 @@ const CommercialDashboard = () => {
     return matchesSearch;
   });
 
-  const handleDeleteOrder = async (orderId: string) => {
-    if (window.confirm('Êtes-vous sûr de vouloir supprimer cette commande ?')) {
-      try {
-        await useStore.getState().deleteOrder(orderId);
-        // Feedback visuel de succès
-        alert('Commande supprimée avec succès');
-      } catch (error) {
-        console.error('Erreur lors de la suppression:', error);
-      }
-    }
-  };
-
   const handleArchiveOrder = async (orderId: string) => {
     if (window.confirm('Êtes-vous sûr de vouloir archiver cette commande ?')) {
       try {
@@ -359,12 +347,6 @@ const CommercialDashboard = () => {
                         className="bg-gray-50 hover:bg-gray-100 text-gray-700 px-3 py-1 rounded text-sm"
                       >
                         Archiver
-                      </button>
-                      <button
-                        onClick={() => handleDeleteOrder(order.id)}
-                        className="bg-red-50 hover:bg-red-100 text-red-700 px-3 py-1 rounded text-sm"
-                      >
-                        Supprimer
                       </button>
                     </div>
                   </div>

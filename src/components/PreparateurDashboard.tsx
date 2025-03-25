@@ -34,6 +34,7 @@ interface EditedOrder {
   palletCount: string;
   plannedDeliveryDate: string;
   status: OrderStatus;
+  preparateur: string;
 }
 
 const formatDateForInput = (date: Date | string | null | undefined): string => {
@@ -177,7 +178,8 @@ const PreparateurDashboard = () => {
       pallets: order.pallets || [],
       palletCount: (order.pallets || []).length.toString(),
       plannedDeliveryDate: formatDateForInput(order.plannedDeliveryDate),
-      status: order.status || 'à planifier'
+      status: order.status || 'à planifier',
+      preparateur: order.preparateur || ''
     });
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -203,6 +205,7 @@ const PreparateurDashboard = () => {
 
         updates.reference = editedOrder.reference;
         updates.pallets = editedOrder.pallets;
+        updates.preparateur = editedOrder.preparateur;
 
         useStore.getState().updateOrder(order.id, updates);
         onSubmit();
@@ -251,6 +254,18 @@ const PreparateurDashboard = () => {
             <option value="planifiée">Planifiée</option>
             <option value="livrée">Livrée</option>
           </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Préparateur
+          </label>
+          <input
+            type="text"
+            value={editedOrder.preparateur}
+            onChange={(e) => setEditedOrder({ ...editedOrder, preparateur: e.target.value })}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base p-3"
+          />
         </div>
 
         <div>
@@ -443,6 +458,9 @@ const PreparateurDashboard = () => {
                       </p>
                       <p className="text-sm text-gray-600">
                         Nombre de palettes : {order.pallets?.length || 0} | Poids total : {order.pallets?.reduce((total, pallet) => total + (pallet.weight || 0), 0)} kg
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        Préparateur : {order.preparateur || 'Non assigné'}
                       </p>
                     </div>
                     <div className="flex flex-row sm:flex-col space-x-2 sm:space-x-0 sm:space-y-2 w-full sm:w-auto">

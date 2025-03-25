@@ -319,18 +319,19 @@ const CommercialDashboard = () => {
               {filteredOrders.map(order => (
                 <div key={order.id} className="mobile-list-item bg-white border border-gray-200 rounded-lg">
                   <div className="flex flex-col sm:flex-row justify-between">
-                    <div className="mb-2 sm:mb-0">
+                    <div>
                       <h3 className="font-semibold text-gray-900">
                         {order.clientName || 'Client sans nom'}
                       </h3>
-                      <p className="text-sm text-gray-600">
-                        Réf: {order.reference || 'N/A'}
-                      </p>
+                      <p className="text-sm text-gray-600">Référence: {order.reference || 'Non définie'}</p>
                       <p className="text-sm text-gray-600">
                         Date de chargement prévu : {order.plannedDeliveryDate ? new Date(order.plannedDeliveryDate).toLocaleDateString() : 'Non planifié'}
                       </p>
                       <p className="text-sm text-gray-600">
                         Nombre de palettes : {order.pallets?.length || 0} | Poids total : {order.pallets?.reduce((total, pallet) => total + (pallet.weight || 0), 0)} kg
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        Préparateur : {order.preparateur || 'Non assigné'}
                       </p>
                       <div className="mt-1">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${

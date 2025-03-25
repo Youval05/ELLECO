@@ -34,12 +34,29 @@ const nextConfig = {
             {
               type: 'header',
               key: 'origin',
-              value: process.env.NEXT_PUBLIC_APP_URL,
+              value: 'https://gestionpwa.vercel.app',
             },
           ],
         },
       ],
     }
+  },
+
+  // Configurations supplémentaires pour le nouveau domaine
+  async redirects() {
+    return [
+      {
+        source: '/:path*',
+        has: [
+          {
+            type: 'host',
+            value: 'elleco.vercel.app',
+          },
+        ],
+        destination: 'https://gestionpwa.vercel.app/:path*',
+        permanent: true,
+      },
+    ]
   },
 }
 

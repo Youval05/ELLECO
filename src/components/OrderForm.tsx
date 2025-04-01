@@ -17,6 +17,7 @@ interface FormData {
   products: string[];
   comments: string;
   commercial: string;
+  reference: string;
 }
 
 const COMMERCIALS = ['En attente', 'Jordan', 'Jérôme', 'Rudy', 'Carlo'];
@@ -31,7 +32,8 @@ const OrderForm = ({ mode, initialOrder, onClose }: OrderFormProps) => {
     address: initialOrderWithConverter?.address || '',
     products: initialOrderWithConverter?.products || [],
     comments: initialOrderWithConverter?.comments || '',
-    commercial: initialOrderWithConverter?.commercial || 'En attente'
+    commercial: initialOrderWithConverter?.commercial || 'En attente',
+    reference: initialOrderWithConverter?.reference || ''
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -42,7 +44,8 @@ const OrderForm = ({ mode, initialOrder, onClose }: OrderFormProps) => {
       address: formData.address,
       products: formData.products,
       comments: formData.comments,
-      commercial: formData.commercial
+      commercial: formData.commercial,
+      reference: formData.reference
     };
 
     if (mode === 'create') {
@@ -80,6 +83,16 @@ const OrderForm = ({ mode, initialOrder, onClose }: OrderFormProps) => {
               onChange={(e) => setFormData({ ...formData, client: e.target.value })}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
               required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Référence</label>
+            <input
+              type="text"
+              value={formData.reference}
+              onChange={(e) => setFormData({ ...formData, reference: e.target.value })}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
             />
           </div>
 

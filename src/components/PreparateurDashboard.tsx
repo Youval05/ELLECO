@@ -269,6 +269,18 @@ const PreparateurDashboard = () => {
         </div>
 
         <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Référence
+          </label>
+          <input
+            type="text"
+            value={editedOrder.reference}
+            onChange={(e) => setEditedOrder({ ...editedOrder, reference: e.target.value })}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base p-3"
+          />
+        </div>
+
+        <div>
           <label className="block text-sm font-medium mb-1">Nombre de palettes</label>
           <input
             type="text"

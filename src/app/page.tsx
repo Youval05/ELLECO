@@ -7,7 +7,8 @@ import PreparateurDashboard from '../components/PreparateurDashboard';
 import ClientProvider from '../components/ClientProvider';
 import FirebaseStatus from '../components/FirebaseStatus';
 import AuthForm from '../components/AuthForm';
-import { migrateOrders } from '../utils/migrateOrders';
+import { collection, getDocs, writeBatch, QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
+import { db } from '../config/firebase';
 
 const USERS = {
   preparateur: ['Bryan', 'Muriel', 'Lena', 'Johan'],
@@ -25,35 +26,37 @@ export default function Home() {
     const init = async () => {
       console.log('Initialisation de la synchronisation...');
       try {
+        // Initialiser Firestore
         const unsubscribe = initSync();
         console.log('Synchronisation initialisée avec succès');
         
-        // Exécuter la migration des commandes
-        try {
-          console.log('Démarrage de la migration des commandes...');
-          const updatedCount = await migrateOrders();
-          console.log(`Migration terminée. ${updatedCount} commandes mises à jour.`);
-          
-          // Forcer un rechargement des commandes après la migration
-          if (updatedCount > 0) {
-            console.log('Rechargement de la page pour appliquer les mises à jour...');
-            window.location.reload();
-          } else {
-            console.log('Aucune mise à jour nécessaire.');
-          }
-        } catch (error) {
-          console.error('Erreur lors de la migration:', error);
-        }
+        // Mettre à jour toutes les commandes sans date de création
+        const ordersRef = collection(db, 'orders');
+        const snapshot = await getDocs(ordersRef);
+        const batch = writeBatch(db);
+        let count = 0;
         
-        return () => {
-          console.log('Nettoyage de la synchronisation...');
-          if (unsubscribe && typeof unsubscribe === 'function') {
-            unsubscribe();
-            console.log('Synchronisation nettoyée');
+        snapshot.forEach((doc: QueryDocumentSnapshot<DocumentData>) => {
+          const data = doc.data();
+          if (!data.createdAt) {
+            batch.update(doc.ref, {
+              createdAt: new Date().toISOString()
+            });
+            count++;
           }
+        });
+
+        if (count > 0) {
+          await batch.commit();
+          console.log(`${count} commandes mises à jour avec une date de création`);
+          window.location.reload();
+        }
+
+        return () => {
+          if (unsubscribe) unsubscribe();
         };
       } catch (error) {
-        console.error('Erreur lors de l\'initialisation de Firestore:', error);
+        console.error('Erreur lors de l\'initialisation:', error);
         return () => {};
       }
     };

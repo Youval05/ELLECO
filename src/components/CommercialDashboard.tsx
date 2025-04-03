@@ -306,24 +306,21 @@ const CommercialDashboard = () => {
                       </p>
                       <p className="text-sm text-gray-600">
                         Créée le : {(() => {
-                          console.log('Données de la commande:', order);
-                          console.log('Date de création:', order.createdAt);
                           if (!order.createdAt) {
-                            console.log('Pas de date de création pour la commande:', order.id);
                             return 'Date inconnue';
                           }
                           try {
                             const date = new Date(order.createdAt);
-                            console.log('Date parsée:', date);
-                            return date.toLocaleDateString('fr-FR', {
+                            const formattedDate = new Intl.DateTimeFormat('fr-FR', {
                               day: '2-digit',
                               month: '2-digit',
                               year: 'numeric',
                               hour: '2-digit',
                               minute: '2-digit'
-                            });
+                            }).format(date);
+                            return formattedDate;
                           } catch (error) {
-                            console.error('Erreur lors du formatage de la date:', error);
+                            console.error('Erreur lors du formatage de la date:', error, 'pour la date:', order.createdAt);
                             return 'Date invalide';
                           }
                         })()}

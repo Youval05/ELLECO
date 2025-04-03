@@ -6,9 +6,8 @@ export const migrateOrders = async () => {
     console.log('Début de la migration des commandes...');
     const ordersRef = collection(db, 'orders');
     
-    // Chercher spécifiquement les commandes sans date de création
-    const q = query(ordersRef, where('createdAt', '==', null));
-    const snapshot = await getDocs(q);
+    // Chercher toutes les commandes
+    const snapshot = await getDocs(ordersRef);
     
     console.log(`Nombre total de commandes trouvées: ${snapshot.size}`);
     
@@ -19,12 +18,15 @@ export const migrateOrders = async () => {
       const data = doc.data();
       console.log(`Traitement de la commande ${doc.id}:`, data);
       
-      const now = new Date().toISOString();
-      batch.update(doc.ref, {
-        createdAt: now
-      });
-      count++;
-      console.log(`Commande ${doc.id} mise à jour avec createdAt = ${now}`);
+      // Mettre à jour toutes les commandes qui n'ont pas de date de création
+      if (!data.createdAt) {
+        const now = new Date().toISOString();
+        batch.update(doc.ref, {
+          createdAt: now
+        });
+        count++;
+        console.log(`Commande ${doc.id} mise à jour avec createdAt = ${now}`);
+      }
     });
 
     if (count > 0) {

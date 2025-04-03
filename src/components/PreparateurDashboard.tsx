@@ -87,7 +87,6 @@ const PreparateurDashboard = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
-  const [sortField, setSortField] = useState<'createdAt' | 'reference'>('createdAt');
 
   const [newOrder, setNewOrder] = useState({
     clientName: '',
@@ -145,27 +144,14 @@ const PreparateurDashboard = () => {
       return matchesSearch;
     })
     .sort((a, b) => {
-      if (sortField === 'createdAt') {
-        const dateA = new Date(a.createdAt).getTime();
-        const dateB = new Date(b.createdAt).getTime();
-        return sortOrder === 'desc' ? dateB - dateA : dateA - dateB;
-      } else {
-        const refA = a.reference || '';
-        const refB = b.reference || '';
-        return sortOrder === 'desc' ? 
-          refB.localeCompare(refA) : 
-          refA.localeCompare(refB);
-      }
+      const dateA = new Date(a.createdAt).getTime();
+      const dateB = new Date(b.createdAt).getTime();
+      return sortOrder === 'desc' ? dateB - dateA : dateA - dateB;
     });
 
   // Fonction pour changer le tri
-  const toggleSort = (field: 'createdAt' | 'reference') => {
-    if (field === sortField) {
-      setSortOrder(sortOrder === 'desc' ? 'asc' : 'desc');
-    } else {
-      setSortField(field);
-      setSortOrder('desc');
-    }
+  const toggleSort = () => {
+    setSortOrder(sortOrder === 'desc' ? 'asc' : 'desc');
   };
 
   const handleDeleteOrder = async (orderId: string) => {
@@ -455,27 +441,13 @@ const PreparateurDashboard = () => {
             />
           </div>
 
-          {/* En-tête avec boutons de tri */}
-          <div className="mb-4 flex items-center space-x-4">
+          {/* En-tête avec bouton de tri */}
+          <div className="mb-4 flex items-center">
             <button
-              onClick={() => toggleSort('createdAt')}
-              className={`px-3 py-1 rounded ${
-                sortField === 'createdAt'
-                  ? 'bg-blue-100 text-blue-700'
-                  : 'bg-gray-100 text-gray-700'
-              }`}
+              onClick={toggleSort}
+              className="px-3 py-1 rounded bg-blue-100 text-blue-700"
             >
-              Date de création {sortField === 'createdAt' && (sortOrder === 'desc' ? '▼' : '▲')}
-            </button>
-            <button
-              onClick={() => toggleSort('reference')}
-              className={`px-3 py-1 rounded ${
-                sortField === 'reference'
-                  ? 'bg-blue-100 text-blue-700'
-                  : 'bg-gray-100 text-gray-700'
-              }`}
-            >
-              Référence {sortField === 'reference' && (sortOrder === 'desc' ? '▼' : '▲')}
+              Date de création {sortOrder === 'desc' ? '▼' : '▲'}
             </button>
           </div>
 

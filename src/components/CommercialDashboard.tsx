@@ -112,10 +112,8 @@ const CommercialDashboard = () => {
   const { orders: allOrders, currentUser } = useStore();
   const [mode, setMode] = useState<'list' | 'edit'>('list');
   const [editingOrder, setEditingOrder] = useState<string | null>(null);
-  const [filter, setFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
-  const [sortField, setSortField] = useState<'createdAt' | 'reference'>('createdAt');
 
   const handlePalletCountChange = (count: number, pallets: Pallet[]) => {
     if (count > pallets.length) {
@@ -137,39 +135,20 @@ const CommercialDashboard = () => {
   // Filtrer et trier les commandes
   const filteredOrders = myOrders
     .filter(order => {
-      // Exclure les commandes archivées
-      if (order.archived === true || order.status === 'archivée') return false;
-      
-      // Filtrer par statut
-      if (filter !== 'all' && order.status !== filter) return false;
-      
       const matchesSearch = searchTerm === '' || 
         order.clientName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         order.reference?.toLowerCase().includes(searchTerm.toLowerCase());
       return matchesSearch;
     })
     .sort((a, b) => {
-      if (sortField === 'createdAt') {
-        const dateA = new Date(a.createdAt).getTime();
-        const dateB = new Date(b.createdAt).getTime();
-        return sortOrder === 'desc' ? dateB - dateA : dateA - dateB;
-      } else {
-        const refA = a.reference || '';
-        const refB = b.reference || '';
-        return sortOrder === 'desc' ? 
-          refB.localeCompare(refA) : 
-          refA.localeCompare(refB);
-      }
+      const dateA = new Date(a.createdAt).getTime();
+      const dateB = new Date(b.createdAt).getTime();
+      return sortOrder === 'desc' ? dateB - dateA : dateA - dateB;
     });
 
   // Fonction pour changer le tri
-  const toggleSort = (field: 'createdAt' | 'reference') => {
-    if (field === sortField) {
-      setSortOrder(sortOrder === 'desc' ? 'asc' : 'desc');
-    } else {
-      setSortField(field);
-      setSortOrder('desc');
-    }
+  const toggleSort = () => {
+    setSortOrder(sortOrder === 'desc' ? 'asc' : 'desc');
   };
 
   const handleArchiveOrder = async (orderId: string) => {
@@ -328,101 +307,80 @@ const CommercialDashboard = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <select
-              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={filter}
-              onChange={(e) => setFilter(e.target.value)}
-            >
-              <option value="all">Tous les statuts</option>
-              <option value="à planifier">À planifier</option>
-              <option value="confirmée">Confirmée</option>
-              <option value="livrée">Livrée</option>
-            </select>
           </div>
 
-          {/* En-tête avec boutons de tri */}
-          <div className="mb-4 flex items-center space-x-4">
+          {/* En-tête avec bouton de tri */}
+          <div className="mb-4 flex items-center">
             <button
-              onClick={() => toggleSort('createdAt')}
-              className={`px-3 py-1 rounded ${
-                sortField === 'createdAt'
-                  ? 'bg-blue-100 text-blue-700'
-                  : 'bg-gray-100 text-gray-700'
-              }`}
+              onClick={toggleSort}
+              className="px-3 py-1 rounded bg-blue-100 text-blue-700"
             >
-              Date de création {sortField === 'createdAt' && (sortOrder === 'desc' ? '▼' : '▲')}
-            </button>
-            <button
-              onClick={() => toggleSort('reference')}
-              className={`px-3 py-1 rounded ${
-                sortField === 'reference'
-                  ? 'bg-blue-100 text-blue-700'
-                  : 'bg-gray-100 text-gray-700'
-              }`}
-            >
-              Référence {sortField === 'reference' && (sortOrder === 'desc' ? '▼' : '▲')}
+              Date de création {sortOrder === 'desc' ? '▼' : '▲'}
             </button>
           </div>
 
-          {filteredOrders.length === 0 ? (
-            <div className="text-center py-8">
-              <p className="text-gray-500">Aucune commande trouvée</p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {filteredOrders.map(order => (
-                <div key={order.id} className="mobile-list-item bg-white border border-gray-200 rounded-lg">
-                  <div className="flex flex-col sm:flex-row justify-between">
-                    <div>
-                      <h3 className="font-semibold text-gray-900">
-                        {order.clientName || 'Client sans nom'}
-                      </h3>
-                      <p className="text-sm text-gray-600">Référence: {order.reference || 'Non définie'}</p>
-                      <p className="text-sm text-gray-600">
-                        Date de chargement prévu : {order.plannedDeliveryDate ? new Date(order.plannedDeliveryDate).toLocaleDateString() : 'Non planifié'}
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        Nombre de palettes : {order.pallets?.length || 0} | Poids total : {order.pallets?.reduce((total, pallet) => total + (pallet.weight || 0), 0)} kg
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        Préparateur : {order.preparateur || 'Non assigné'}
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        Créée le : {formatDate(order.createdAt)}
-                      </p>
-                      <div className="mt-1">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          order.status === 'à planifier' ? 'bg-yellow-100 text-yellow-800' :
-                          order.status === 'confirmée' ? 'bg-green-100 text-green-800' :
-                          order.status === 'livrée' ? 'bg-blue-100 text-blue-800' :
-                          'bg-gray-100 text-gray-800'
-                        }`}>
-                          {order.status}
-                        </span>
+          {/* Liste des commandes */}
+          <div className="space-y-4">
+            {filteredOrders.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-gray-500">Aucune commande trouvée</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {filteredOrders.map(order => (
+                  <div key={order.id} className="mobile-list-item bg-white border border-gray-200 rounded-lg">
+                    <div className="flex flex-col sm:flex-row justify-between">
+                      <div>
+                        <h3 className="font-semibold text-gray-900">
+                          {order.clientName || 'Client sans nom'}
+                        </h3>
+                        <p className="text-sm text-gray-600">Référence: {order.reference || 'Non définie'}</p>
+                        <p className="text-sm text-gray-600">
+                          Date de chargement prévu : {order.plannedDeliveryDate ? new Date(order.plannedDeliveryDate).toLocaleDateString() : 'Non planifié'}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          Nombre de palettes : {order.pallets?.length || 0} | Poids total : {order.pallets?.reduce((total, pallet) => total + (pallet.weight || 0), 0)} kg
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          Préparateur : {order.preparateur || 'Non assigné'}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          Créée le : {formatDate(order.createdAt)}
+                        </p>
+                        <div className="mt-1">
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            order.status === 'à planifier' ? 'bg-yellow-100 text-yellow-800' :
+                            order.status === 'confirmée' ? 'bg-green-100 text-green-800' :
+                            order.status === 'livrée' ? 'bg-blue-100 text-blue-800' :
+                            'bg-gray-100 text-gray-800'
+                          }`}>
+                            {order.status}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex flex-row sm:flex-col justify-end space-x-2 sm:space-x-0 sm:space-y-2">
+                        <button
+                          onClick={() => {
+                            setEditingOrder(order.id);
+                            setMode('edit');
+                          }}
+                          className="bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-1 rounded text-sm"
+                        >
+                          Modifier
+                        </button>
+                        <button
+                          onClick={() => handleArchiveOrder(order.id)}
+                          className="bg-gray-50 hover:bg-gray-100 text-gray-700 px-3 py-1 rounded text-sm"
+                        >
+                          Archiver
+                        </button>
                       </div>
                     </div>
-                    <div className="flex flex-row sm:flex-col justify-end space-x-2 sm:space-x-0 sm:space-y-2">
-                      <button
-                        onClick={() => {
-                          setEditingOrder(order.id);
-                          setMode('edit');
-                        }}
-                        className="bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-1 rounded text-sm"
-                      >
-                        Modifier
-                      </button>
-                      <button
-                        onClick={() => handleArchiveOrder(order.id)}
-                        className="bg-gray-50 hover:bg-gray-100 text-gray-700 px-3 py-1 rounded text-sm"
-                      >
-                        Archiver
-                      </button>
-                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

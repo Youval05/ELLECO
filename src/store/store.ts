@@ -14,6 +14,7 @@ import {
 } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { Order, OrderStatus } from '../types/order';
+import { nanoid } from 'nanoid';
 
 // Type pour les mises à jour Firestore (où les dates sont des chaînes)
 interface FirestoreOrderUpdate extends Omit<Partial<Order>, 'plannedDeliveryDate'> {
@@ -163,21 +164,19 @@ export const useStore = create<StoreState>()(
     addOrder: async (order: Partial<Order>) => {
       try {
         const now = new Date();
-        const ordersRef = collection(db, 'orders');
-        
-        // Utiliser "En attente" comme commercial par défaut
-        const orderData: FirestoreOrderUpdate = {
+        const newOrder: Order = {
           ...order,
-          commercial: order.commercial || 'En attente',
+          id: nanoid(),
           version: 1,
           archived: false,
+          createdAt: now.toISOString(),
           status: order.status || 'à planifier',
-          plannedDeliveryDate: order.plannedDeliveryDate?.toISOString() || null,
-          lastModified: now.toISOString(),
-          createdAt: now.toISOString()
+          plannedDeliveryDate: order.plannedDeliveryDate instanceof Date ? order.plannedDeliveryDate.toISOString() : null,
+          lastModified: now.toISOString()
         };
 
-        await addDoc(ordersRef, orderData);
+        const ordersRef = collection(db, 'orders');
+        await addDoc(ordersRef, newOrder);
       } catch (error) {
         console.error('Erreur lors de l\'ajout de la commande:', error);
         throw error;

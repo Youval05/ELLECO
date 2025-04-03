@@ -30,7 +30,13 @@ export default function Home() {
         
         // Exécuter la migration des commandes
         try {
-          await migrateOrders();
+          const updatedCount = await migrateOrders();
+          console.log(`Migration terminée. ${updatedCount} commandes mises à jour.`);
+          
+          // Forcer un rechargement des commandes après la migration
+          if (updatedCount > 0) {
+            window.location.reload();
+          }
         } catch (error) {
           console.error('Erreur lors de la migration:', error);
         }

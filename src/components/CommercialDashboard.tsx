@@ -75,6 +75,39 @@ const formatDateForInput = (date: Date | string | null | undefined): string => {
   }
 };
 
+const formatDate = (dateStr: string | null | undefined): string => {
+  console.log('Tentative de formatage de la date:', dateStr);
+  if (!dateStr) {
+    console.log('Date non définie');
+    return 'Date inconnue';
+  }
+
+  try {
+    const date = new Date(dateStr);
+    console.log('Date parsée:', date);
+    if (isNaN(date.getTime())) {
+      console.log('Date invalide après parsing');
+      return 'Date invalide';
+    }
+
+    const formatter = new Intl.DateTimeFormat('fr-FR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    });
+
+    const formatted = formatter.format(date);
+    console.log('Date formatée:', formatted);
+    return formatted;
+  } catch (error) {
+    console.error('Erreur lors du formatage:', error);
+    return 'Erreur de date';
+  }
+};
+
 const CommercialDashboard = () => {
   const { orders: allOrders, currentUser } = useStore();
   const [mode, setMode] = useState<'list' | 'edit'>('list');
@@ -305,25 +338,7 @@ const CommercialDashboard = () => {
                         Préparateur : {order.preparateur || 'Non assigné'}
                       </p>
                       <p className="text-sm text-gray-600">
-                        Créée le : {(() => {
-                          if (!order.createdAt) {
-                            return 'Date inconnue';
-                          }
-                          try {
-                            const date = new Date(order.createdAt);
-                            const formattedDate = new Intl.DateTimeFormat('fr-FR', {
-                              day: '2-digit',
-                              month: '2-digit',
-                              year: 'numeric',
-                              hour: '2-digit',
-                              minute: '2-digit'
-                            }).format(date);
-                            return formattedDate;
-                          } catch (error) {
-                            console.error('Erreur lors du formatage de la date:', error, 'pour la date:', order.createdAt);
-                            return 'Date invalide';
-                          }
-                        })()}
+                        Créée le : {formatDate(order.createdAt)}
                       </p>
                       <div className="mt-1">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${

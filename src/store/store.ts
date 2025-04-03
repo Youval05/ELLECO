@@ -148,16 +148,16 @@ export const useStore = create<StoreState>()(
 
     addOrder: async (order: Partial<Order>) => {
       try {
-        const now = new Date();
+        const now = new Date().toISOString();
         const newOrder: Order = {
-          ...order,
           id: nanoid(),
+          createdAt: now, // Toujours définir createdAt
           version: 1,
           archived: false,
-          createdAt: now.toISOString(),
           status: order.status || 'à planifier',
-          plannedDeliveryDate: order.plannedDeliveryDate ? new Date(order.plannedDeliveryDate).toISOString() : null,
-          lastModified: now.toISOString()
+          plannedDeliveryDate: order.plannedDeliveryDate || null,
+          lastModified: now,
+          ...order
         };
 
         const ordersRef = collection(db, 'orders');
@@ -170,7 +170,7 @@ export const useStore = create<StoreState>()(
 
     updateOrder: async (orderId: string, updates: Partial<Order>) => {
       try {
-        const now = new Date();
+        const now = new Date().toISOString();
         const orderRef = doc(db, 'orders', orderId);
         const orderDoc = await getDoc(orderRef);
 
@@ -181,8 +181,9 @@ export const useStore = create<StoreState>()(
         const orderData = orderDoc.data();
         const updatedOrder = {
           ...updates,
-          lastModified: now.toISOString(),
-          plannedDeliveryDate: updates.plannedDeliveryDate ? updates.plannedDeliveryDate : null
+          lastModified: now,
+          createdAt: orderData.createdAt || now, // Garder la date de création existante ou en créer une
+          plannedDeliveryDate: updates.plannedDeliveryDate || null
         };
 
         await updateDoc(orderRef, updatedOrder);

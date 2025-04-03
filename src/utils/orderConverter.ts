@@ -7,6 +7,8 @@ export const convertLegacyOrder = (legacyOrder: Partial<Order>): Order => {
     height: typeof pallet.height === 'number' ? pallet.height : 0
   })) || [];
 
+  const now = new Date().toISOString();
+
   return {
     id: legacyOrder.id || '',
     reference: legacyOrder.reference,
@@ -18,8 +20,11 @@ export const convertLegacyOrder = (legacyOrder: Partial<Order>): Order => {
     address: legacyOrder.address,
     products: legacyOrder.products || [],
     comments: legacyOrder.comments,
-    status: legacyOrder.status,
+    status: legacyOrder.status || 'à planifier',
     preparateur: legacyOrder.preparateur,
-    version: legacyOrder.version || 0
+    version: legacyOrder.version || 0,
+    archived: legacyOrder.archived || false,
+    createdAt: legacyOrder.createdAt || now,
+    lastModified: legacyOrder.lastModified || now
   };
 };

@@ -3,7 +3,7 @@ export type OrderStatus = 'pending' | 'preparing' | 'ready' | 'delivered' | 'à 
 export interface Order {
   id: string;
   reference?: string;
-  plannedDeliveryDate?: Date | null;
+  plannedDeliveryDate?: string | null;
   pallets?: Pallet[];
   commercial?: string;
   clientName?: string;
@@ -17,6 +17,7 @@ export interface Order {
   archived?: boolean;
   archivedAt?: string;
   createdAt?: string;
+  lastModified?: string;
 }
 
 export interface Pallet {

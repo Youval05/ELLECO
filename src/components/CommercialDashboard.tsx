@@ -14,12 +14,8 @@ const DEFAULT_PALLET: Pallet = {
   height: 0
 };
 
-interface OrderUpdateData extends Partial<Order> {
-  pallets?: Pallet[];
-  status?: OrderStatus;
-  preparateur?: string;
-  reference?: string;
-  plannedDeliveryDate?: Date | null;
+interface OrderUpdateData extends Omit<Partial<Order>, 'plannedDeliveryDate'> {
+  plannedDeliveryDate?: string | null;
 }
 
 interface OrderFormProps {
@@ -28,7 +24,7 @@ interface OrderFormProps {
   onCancel: () => void;
 }
 
-interface EditedOrder {
+interface EditedOrderForm {
   reference: string;
   pallets: Pallet[];
   palletCount: string;
@@ -133,41 +129,28 @@ const CommercialDashboard = () => {
     }
   };
 
-  const OrderForm = ({ order, onSubmit, onCancel }: OrderFormProps) => {
-    const [editedOrder, setEditedOrder] = useState<EditedOrder>({
+  const OrderForm: React.FC<OrderFormProps> = ({ order, onSubmit, onCancel }) => {
+    const [editedOrder, setEditedOrder] = useState<EditedOrderForm>({
       reference: order.reference || '',
       pallets: order.pallets || [],
-      palletCount: (order.pallets || []).length.toString(),
-      plannedDeliveryDate: formatDateForInput(order.plannedDeliveryDate),
+      palletCount: (order.pallets?.length || 0).toString(),
+      plannedDeliveryDate: order.plannedDeliveryDate || '',
       status: order.status || 'à planifier'
     });
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
-      if (editedOrder) {
-        const updates: Partial<Order> = {};
+      try {
+        const updatedOrder: OrderUpdateData = {
+          reference: editedOrder.reference,
+          plannedDeliveryDate: editedOrder.plannedDeliveryDate ? editedOrder.plannedDeliveryDate : null,
+          status: editedOrder.status
+        };
 
-        if (editedOrder.plannedDeliveryDate && editedOrder.plannedDeliveryDate.trim() !== '') {
-          try {
-            const date = new Date(editedOrder.plannedDeliveryDate);
-            if (!isNaN(date.getTime())) {
-              updates.plannedDeliveryDate = date;
-              updates.status = 'confirmée';
-            }
-          } catch {
-            updates.plannedDeliveryDate = null;
-            updates.status = 'à planifier';
-          }
-        } else {
-          updates.plannedDeliveryDate = null;
-          updates.status = 'à planifier';
-        }
-
-        updates.reference = editedOrder.reference;
-        updates.pallets = editedOrder.pallets;
-
-        useStore.getState().updateOrder(order.id, updates);
+        useStore.getState().updateOrder(order.id, updatedOrder);
         onSubmit();
+      } catch (error) {
+        console.error('Erreur lors de la mise à jour:', error);
       }
     };
 

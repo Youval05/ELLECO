@@ -10,7 +10,8 @@ import {
   where,
   getDocs,
   writeBatch,
-  Timestamp
+  Timestamp,
+  getDoc
 } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { Order, OrderStatus } from '../types/order';
@@ -171,7 +172,7 @@ export const useStore = create<StoreState>()(
           archived: false,
           createdAt: now.toISOString(),
           status: order.status || 'à planifier',
-          plannedDeliveryDate: order.plannedDeliveryDate instanceof Date ? order.plannedDeliveryDate.toISOString() : null,
+          plannedDeliveryDate: order.plannedDeliveryDate ? new Date(order.plannedDeliveryDate).toISOString() : null,
           lastModified: now.toISOString()
         };
 
@@ -183,61 +184,27 @@ export const useStore = create<StoreState>()(
       }
     },
 
-    updateOrder: async (orderId, updates) => {
+    updateOrder: async (orderId: string, updates: Partial<Order>) => {
       try {
-        set({ syncStatus: 'syncing' });
-        console.log('État de synchronisation mis à jour: syncing');
-        
+        const now = new Date();
         const orderRef = doc(db, 'orders', orderId);
-        
-        // Convertir les dates en chaînes ISO pour Firestore
-        const processedUpdates: FirestoreOrderUpdate = {};
-        
-        // Copier toutes les propriétés sauf plannedDeliveryDate
-        Object.keys(updates).forEach(key => {
-          if (key !== 'plannedDeliveryDate') {
-            // @ts-ignore - Nous savons que ces propriétés sont compatibles
-            processedUpdates[key] = updates[key];
-          }
-        });
-        
-        // Traiter la date de livraison planifiée séparément
-        if (updates.plannedDeliveryDate instanceof Date) {
-          if (!isNaN(updates.plannedDeliveryDate.getTime())) {
-            // Convertir la date en chaîne pour Firestore
-            processedUpdates.plannedDeliveryDate = updates.plannedDeliveryDate.toISOString();
-          } else {
-            processedUpdates.plannedDeliveryDate = null;
-          }
-        } else if (updates.plannedDeliveryDate === null) {
-          processedUpdates.plannedDeliveryDate = null;
+        const orderDoc = await getDoc(orderRef);
+
+        if (!orderDoc.exists()) {
+          throw new Error('Order not found');
         }
-        
+
+        const orderData = orderDoc.data();
         const updatedOrder = {
-          ...processedUpdates,
-          version: (get().orders.find(o => o.id === orderId)?.version || 0) + 1,
-          lastModified: new Date().toISOString()
+          ...updates,
+          lastModified: now.toISOString(),
+          plannedDeliveryDate: updates.plannedDeliveryDate ? updates.plannedDeliveryDate : null
         };
-        
+
         await updateDoc(orderRef, updatedOrder);
-        
-        // Mettre à jour l'état local pour une réponse plus rapide
-        const updatedOrders = get().orders.map(order => {
-          if (order.id === orderId) {
-            // Préserver le type Date pour l'état local
-            return { ...order, ...updates };
-          }
-          return order;
-        });
-        
-        set({ 
-          orders: updatedOrders,
-          syncStatus: 'connected', 
-          lastSync: new Date() 
-        });
       } catch (error) {
-        console.error('Erreur lors de la mise à jour:', error);
-        set({ syncStatus: 'offline' });
+        console.error('Erreur lors de la mise à jour de la commande:', error);
+        throw error;
       }
     },
 

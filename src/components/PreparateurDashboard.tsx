@@ -86,6 +86,8 @@ const PreparateurDashboard = () => {
   const [editingOrder, setEditingOrder] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [sortField, setSortField] = useState<'createdAt' | 'reference'>('createdAt');
 
   const [newOrder, setNewOrder] = useState({
     clientName: '',
@@ -128,7 +130,7 @@ const PreparateurDashboard = () => {
 
   const ordersList = orders.map(order => convertLegacyOrder(order));
 
-  // Filtrer les commandes en fonction de la recherche et du filtre de statut
+  // Filtrer et trier les commandes
   const filteredOrders = ordersList
     .filter(order => {
       // Exclure les commandes archivées
@@ -137,12 +139,34 @@ const PreparateurDashboard = () => {
       // Filtrer par statut
       if (statusFilter !== 'all' && order.status !== statusFilter) return false;
       
-      // Filtrer par recherche
       const matchesSearch = searchTerm === '' || 
         order.clientName?.toLowerCase().includes(searchTerm.toLowerCase()) || 
         order.reference?.toLowerCase().includes(searchTerm.toLowerCase());
       return matchesSearch;
+    })
+    .sort((a, b) => {
+      if (sortField === 'createdAt') {
+        const dateA = new Date(a.createdAt).getTime();
+        const dateB = new Date(b.createdAt).getTime();
+        return sortOrder === 'desc' ? dateB - dateA : dateA - dateB;
+      } else {
+        const refA = a.reference || '';
+        const refB = b.reference || '';
+        return sortOrder === 'desc' ? 
+          refB.localeCompare(refA) : 
+          refA.localeCompare(refB);
+      }
     });
+
+  // Fonction pour changer le tri
+  const toggleSort = (field: 'createdAt' | 'reference') => {
+    if (field === sortField) {
+      setSortOrder(sortOrder === 'desc' ? 'asc' : 'desc');
+    } else {
+      setSortField(field);
+      setSortOrder('desc');
+    }
+  };
 
   const handleDeleteOrder = async (orderId: string) => {
     if (window.confirm('Êtes-vous sûr de vouloir supprimer cette commande ?')) {
@@ -429,6 +453,30 @@ const PreparateurDashboard = () => {
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
             />
+          </div>
+
+          {/* En-tête avec boutons de tri */}
+          <div className="mb-4 flex items-center space-x-4">
+            <button
+              onClick={() => toggleSort('createdAt')}
+              className={`px-3 py-1 rounded ${
+                sortField === 'createdAt'
+                  ? 'bg-blue-100 text-blue-700'
+                  : 'bg-gray-100 text-gray-700'
+              }`}
+            >
+              Date de création {sortField === 'createdAt' && (sortOrder === 'desc' ? '▼' : '▲')}
+            </button>
+            <button
+              onClick={() => toggleSort('reference')}
+              className={`px-3 py-1 rounded ${
+                sortField === 'reference'
+                  ? 'bg-blue-100 text-blue-700'
+                  : 'bg-gray-100 text-gray-700'
+              }`}
+            >
+              Référence {sortField === 'reference' && (sortOrder === 'desc' ? '▼' : '▲')}
+            </button>
           </div>
 
           {/* Liste des commandes */}

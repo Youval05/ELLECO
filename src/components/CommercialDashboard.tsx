@@ -305,13 +305,28 @@ const CommercialDashboard = () => {
                         Préparateur : {order.preparateur || 'Non assigné'}
                       </p>
                       <p className="text-sm text-gray-600">
-                        Créée le : {order.createdAt ? new Date(order.createdAt).toLocaleDateString('fr-FR', {
-                          day: '2-digit',
-                          month: '2-digit',
-                          year: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        }) : 'Date inconnue'}
+                        Créée le : {(() => {
+                          console.log('Données de la commande:', order);
+                          console.log('Date de création:', order.createdAt);
+                          if (!order.createdAt) {
+                            console.log('Pas de date de création pour la commande:', order.id);
+                            return 'Date inconnue';
+                          }
+                          try {
+                            const date = new Date(order.createdAt);
+                            console.log('Date parsée:', date);
+                            return date.toLocaleDateString('fr-FR', {
+                              day: '2-digit',
+                              month: '2-digit',
+                              year: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            });
+                          } catch (error) {
+                            console.error('Erreur lors du formatage de la date:', error);
+                            return 'Date invalide';
+                          }
+                        })()}
                       </p>
                       <div className="mt-1">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${

@@ -94,12 +94,7 @@ export const useStore = create<StoreState>()(
 
     initSync: () => {
       try {
-        // Exécuter la migration des commandes immédiatement
-        migrateOrders().catch(error => {
-          console.error('Erreur lors de la migration initiale:', error);
-        });
-
-        // Configurer la synchronisation Firestore
+        console.log('Initialisation de la synchronisation...');
         const ordersRef = collection(db, 'orders');
         const q = query(ordersRef, where('archived', '==', false));
         
@@ -107,13 +102,26 @@ export const useStore = create<StoreState>()(
           const orders: Order[] = [];
           snapshot.forEach((doc) => {
             const data = doc.data();
+            console.log('Document récupéré:', doc.id, data);
+            
+            // S'assurer que createdAt est toujours présent
+            if (!data.createdAt) {
+              console.log('Mise à jour de la date de création pour:', doc.id);
+              const now = new Date().toISOString();
+              updateDoc(doc.ref, { createdAt: now })
+                .then(() => console.log('Date de création mise à jour pour:', doc.id))
+                .catch(err => console.error('Erreur lors de la mise à jour:', err));
+              data.createdAt = now;
+            }
+
             orders.push({
               ...data,
               id: doc.id,
-              createdAt: data.createdAt || new Date().toISOString() // Fallback pour createdAt
+              createdAt: data.createdAt
             } as Order);
           });
           
+          console.log('Commandes synchronisées:', orders);
           set({ 
             orders,
             syncStatus: 'connected',

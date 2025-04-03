@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { 
   collection, 
   addDoc, 
-  updateDoc, 
+  updateDoc,
   deleteDoc, 
   doc, 
   onSnapshot,
@@ -10,12 +10,13 @@ import {
   where,
   getDocs,
   writeBatch,
-  Timestamp,
-  getDoc
+  getDoc,
+  Timestamp
 } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { Order, OrderStatus } from '../types/order';
 import { nanoid } from 'nanoid';
+import { migrateOrders } from '../utils/migrateOrders';
 
 // Type pour les mises à jour Firestore (où les dates sont des chaînes)
 interface FirestoreOrderUpdate extends Omit<Partial<Order>, 'plannedDeliveryDate'> {
@@ -92,66 +93,41 @@ export const useStore = create<StoreState>()(
     },
 
     initSync: () => {
-      const { checkOrdersToArchive } = get();
-      set({ syncStatus: 'syncing' });
-
       try {
-        // Configuration de l'archivage automatique quotidien
-        const now = new Date();
-        const nextMidnight = new Date(now);
-        nextMidnight.setDate(nextMidnight.getDate() + 1);
-        nextMidnight.setHours(0, 0, 0, 0);
-        
-        const timeUntilMidnight = nextMidnight.getTime() - now.getTime();
-        
-        // Exécuter l'archivage immédiatement au démarrage
-        checkOrdersToArchive();
-        
-        // Configurer l'archivage automatique quotidien
-        const dailyArchiveInterval = setInterval(() => {
-          checkOrdersToArchive();
-        }, 24 * 60 * 60 * 1000); // 24 heures
+        // Exécuter la migration des commandes immédiatement
+        migrateOrders().catch(error => {
+          console.error('Erreur lors de la migration initiale:', error);
+        });
 
-        // Première exécution à minuit
-        const initialTimeout = setTimeout(() => {
-          checkOrdersToArchive();
-        }, timeUntilMidnight);
-
-        // Configurer la synchronisation en temps réel
+        // Configurer la synchronisation Firestore
         const ordersRef = collection(db, 'orders');
-        const unsubscribe = onSnapshot(
-          ordersRef,
-          (snapshot) => {
-            const orders: Order[] = [];
-            snapshot.forEach((doc) => {
-              const data = doc.data();
-              orders.push({
-                id: doc.id,
-                ...data,
-                plannedDeliveryDate: data.plannedDeliveryDate ? new Date(data.plannedDeliveryDate) : null
-              } as Order);
-            });
-            set({
-              orders,
-              syncStatus: 'connected',
-              lastSync: new Date(),
-              syncError: null
-            });
-          },
-          (error) => {
-            console.error('Erreur de synchronisation Firestore:', error);
-            set({
-              syncStatus: 'error',
-              syncError: error.message
-            });
-          }
-        );
+        const q = query(ordersRef, where('archived', '==', false));
+        
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+          const orders: Order[] = [];
+          snapshot.forEach((doc) => {
+            const data = doc.data();
+            orders.push({
+              ...data,
+              id: doc.id,
+              createdAt: data.createdAt || new Date().toISOString() // Fallback pour createdAt
+            } as Order);
+          });
+          
+          set({ 
+            orders,
+            syncStatus: 'connected',
+            lastSync: new Date()
+          });
+        }, (error) => {
+          console.error('Erreur de synchronisation Firestore:', error);
+          set({ 
+            syncStatus: 'error',
+            syncError: error.message
+          });
+        });
 
-        return () => {
-          unsubscribe();
-          clearInterval(dailyArchiveInterval);
-          clearTimeout(initialTimeout);
-        };
+        return unsubscribe;
       } catch (error) {
         console.error('Erreur lors de l\'initialisation de la synchronisation:', error);
         set({

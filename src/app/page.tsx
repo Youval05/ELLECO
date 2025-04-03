@@ -7,6 +7,7 @@ import PreparateurDashboard from '../components/PreparateurDashboard';
 import ClientProvider from '../components/ClientProvider';
 import FirebaseStatus from '../components/FirebaseStatus';
 import AuthForm from '../components/AuthForm';
+import { migrateOrders } from '../utils/migrateOrders';
 
 const USERS = {
   preparateur: ['Bryan', 'Muriel', 'Lena', 'Johan'],
@@ -21,21 +22,33 @@ export default function Home() {
   const { setUser, currentUser, userType, initSync } = useStore();
   
   useEffect(() => {
-    console.log('Initialisation de la synchronisation...');
-    try {
-      const unsubscribe = initSync();
-      console.log('Synchronisation initialisée avec succès');
-      return () => {
-        console.log('Nettoyage de la synchronisation...');
-        if (unsubscribe && typeof unsubscribe === 'function') {
-          unsubscribe();
-          console.log('Synchronisation nettoyée');
+    const init = async () => {
+      console.log('Initialisation de la synchronisation...');
+      try {
+        const unsubscribe = initSync();
+        console.log('Synchronisation initialisée avec succès');
+        
+        // Exécuter la migration des commandes
+        try {
+          await migrateOrders();
+        } catch (error) {
+          console.error('Erreur lors de la migration:', error);
         }
-      };
-    } catch (error) {
-      console.error('Erreur lors de l\'initialisation de Firestore:', error);
-      return () => {};
-    }
+        
+        return () => {
+          console.log('Nettoyage de la synchronisation...');
+          if (unsubscribe && typeof unsubscribe === 'function') {
+            unsubscribe();
+            console.log('Synchronisation nettoyée');
+          }
+        };
+      } catch (error) {
+        console.error('Erreur lors de l\'initialisation de Firestore:', error);
+        return () => {};
+      }
+    };
+
+    init();
   }, [initSync]);
 
   const handleAuth = (success: boolean) => {

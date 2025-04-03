@@ -20,6 +20,7 @@ interface FirestoreOrderUpdate extends Omit<Partial<Order>, 'plannedDeliveryDate
   plannedDeliveryDate?: string | null;
   version?: number;
   lastModified?: string;
+  createdAt?: string;
 }
 
 export interface StoreState {
@@ -172,7 +173,8 @@ export const useStore = create<StoreState>()(
           archived: false,
           status: order.status || 'à planifier',
           plannedDeliveryDate: order.plannedDeliveryDate?.toISOString() || null,
-          lastModified: now.toISOString()
+          lastModified: now.toISOString(),
+          createdAt: now.toISOString()
         };
 
         await addDoc(ordersRef, orderData);

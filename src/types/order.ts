@@ -16,6 +16,7 @@ export interface Order {
   version?: number;
   archived?: boolean;
   archivedAt?: string;
+  createdAt?: string;
 }
 
 export interface Pallet {

@@ -475,6 +475,15 @@ const PreparateurDashboard = () => {
                       <p className="text-sm text-gray-600">
                         Préparateur : {order.preparateur || 'Non assigné'}
                       </p>
+                      <p className="text-sm text-gray-600">
+                        Créée le : {order.createdAt ? new Date(order.createdAt).toLocaleDateString('fr-FR', {
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: '2-digit',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        }) : 'Date inconnue'}
+                      </p>
                     </div>
                     <div className="flex flex-row sm:flex-col space-x-2 sm:space-x-0 sm:space-y-2 w-full sm:w-auto">
                       <button

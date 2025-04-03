@@ -321,6 +321,15 @@ const CommercialDashboard = () => {
                       <p className="text-sm text-gray-600">
                         Préparateur : {order.preparateur || 'Non assigné'}
                       </p>
+                      <p className="text-sm text-gray-600">
+                        Créée le : {order.createdAt ? new Date(order.createdAt).toLocaleDateString('fr-FR', {
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: '2-digit',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        }) : 'Date inconnue'}
+                      </p>
                       <div className="mt-1">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                           order.status === 'à planifier' ? 'bg-yellow-100 text-yellow-800' :

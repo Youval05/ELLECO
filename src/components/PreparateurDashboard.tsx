@@ -289,88 +289,105 @@ const PreparateurDashboard = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">Nombre de palettes</label>
-          <input
-            type="text"
-            inputMode="numeric"
-            className="w-full p-3 border border-gray-300 rounded-md text-base"
-            value={editedOrder.palletCount}
-            onChange={e => {
-              const count = parseInt(e.target.value) || 0;
-              const newPallets = handlePalletCountChange(count, editedOrder.pallets);
-              setEditedOrder({
-                ...editedOrder,
-                palletCount: e.target.value,
-                pallets: newPallets
-              });
-            }}
-          />
-        </div>
-        
-        <div className="space-y-6">
-          {editedOrder.pallets?.map((pallet: Pallet, index: number) => (
-            <div key={index} className="border border-gray-200 p-4 rounded-lg">
-              <h4 className="font-medium mb-3 text-base">Palette {index + 1}</h4>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1">Poids (kg)</label>
-                  <input
-                    type="text"
-                    inputMode="decimal"
-                    className="w-full p-3 border border-gray-300 rounded-md text-base"
-                    value={pallet.weight}
-                    onChange={e => {
+          <div className="flex justify-between items-center mb-2">
+            <label className="block text-sm font-medium mb-1">Palettes</label>
+            <button
+              type="button"
+              onClick={() => {
+                const newPallets = [...editedOrder.pallets, { ...DEFAULT_PALLET }];
+                setEditedOrder({
+                  ...editedOrder,
+                  pallets: newPallets,
+                  palletCount: newPallets.length.toString()
+                });
+              }}
+              className="bg-blue-100 text-blue-600 px-3 py-1 rounded-lg text-sm font-medium hover:bg-blue-200"
+            >
+              + Ajouter une palette
+            </button>
+          </div>
+          <div className="space-y-6">
+            {editedOrder.pallets?.map((pallet: Pallet, index: number) => (
+              <div key={index} className="border border-gray-200 p-4 rounded-lg">
+                <div className="flex justify-between items-center">
+                  <h4 className="font-medium mb-3 text-base">Palette {index + 1}</h4>
+                  <button
+                    type="button"
+                    onClick={() => {
                       const newPallets = [...editedOrder.pallets];
-                      newPallets[index] = {
-                        ...pallet,
-                        weight: parseFloat(e.target.value) || 0
-                      };
-                      setEditedOrder({ ...editedOrder, pallets: newPallets });
+                      newPallets.splice(index, 1);
+                      setEditedOrder({
+                        ...editedOrder,
+                        pallets: newPallets,
+                        palletCount: newPallets.length.toString()
+                      });
                     }}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Dimensions</label>
-                  <select
-                    className="w-full p-3 border border-gray-300 rounded-md text-base"
-                    value={pallet.dimensions}
-                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-                      const newPallets = [...editedOrder.pallets];
-                      newPallets[index] = {
-                        ...pallet,
-                        dimensions: e.target.value
-                      };
-                      setEditedOrder({ ...editedOrder, pallets: newPallets });
-                    }}
+                    className="text-red-600 hover:text-red-800"
                   >
-                    <option value="">Sélectionner</option>
-                    {PALLET_DIMENSIONS.map(dim => (
-                      <option key={dim} value={dim}>
-                        {dim}
-                      </option>
-                    ))}
-                  </select>
+                    Supprimer
+                  </button>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Hauteur (cm)</label>
-                  <input
-                    type="text"
-                    inputMode="decimal"
-                    className="w-full p-3 border border-gray-300 rounded-md text-base"
-                    value={pallet.height}
-                    onChange={e => {
-                      const newPallets = [...editedOrder.pallets];
-                      newPallets[index] = {
-                        ...pallet,
-                        height: parseFloat(e.target.value) || 0
-                      };
-                      setEditedOrder({ ...editedOrder, pallets: newPallets });
-                    }}
-                  />
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Poids (kg)</label>
+                    <input
+                      type="text"
+                      inputMode="decimal"
+                      className="w-full p-3 border border-gray-300 rounded-md text-base"
+                      value={pallet.weight}
+                      onChange={e => {
+                        const newPallets = [...editedOrder.pallets];
+                        newPallets[index] = {
+                          ...pallet,
+                          weight: parseFloat(e.target.value) || 0
+                        };
+                        setEditedOrder({ ...editedOrder, pallets: newPallets });
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Dimensions</label>
+                    <select
+                      className="w-full p-3 border border-gray-300 rounded-md text-base"
+                      value={pallet.dimensions}
+                      onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                        const newPallets = [...editedOrder.pallets];
+                        newPallets[index] = {
+                          ...pallet,
+                          dimensions: e.target.value
+                        };
+                        setEditedOrder({ ...editedOrder, pallets: newPallets });
+                      }}
+                    >
+                      <option value="">Sélectionner</option>
+                      {PALLET_DIMENSIONS.map(dim => (
+                        <option key={dim} value={dim}>
+                          {dim}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Hauteur (cm)</label>
+                    <input
+                      type="text"
+                      inputMode="decimal"
+                      className="w-full p-3 border border-gray-300 rounded-md text-base"
+                      value={pallet.height}
+                      onChange={e => {
+                        const newPallets = [...editedOrder.pallets];
+                        newPallets[index] = {
+                          ...pallet,
+                          height: parseFloat(e.target.value) || 0
+                        };
+                        setEditedOrder({ ...editedOrder, pallets: newPallets });
+                      }}
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
 
         <div className="flex flex-col sm:flex-row justify-between pt-4 border-t border-gray-200 space-y-3 sm:space-y-0">
@@ -615,94 +632,107 @@ const PreparateurDashboard = () => {
               </div>
 
               <div className="mb-4">
-                <label className="block text-sm font-medium mb-1">Nombre de palettes</label>
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  className="w-full p-3 border border-gray-300 rounded-lg text-base"
-                  value={newOrder.palletCount}
-                  onChange={e => {
-                    const count = parseInt(e.target.value) || 0;
-                    const newPallets: Pallet[] = Array(count).fill({
-                      dimensions: '80x120',
-                      weight: 0,
-                      height: 0
-                    });
-                    setNewOrder({
-                      ...newOrder,
-                      palletCount: e.target.value,
-                      pallets: newPallets
-                    });
-                  }}
-                />
-              </div>
-
-              {newOrder.pallets?.map((pallet, index) => (
-                <div key={index} className="mb-4 p-4 border border-gray-300 rounded-lg">
-                  <h3 className="font-medium mb-3 text-base">Palette {index + 1}</h3>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium mb-1">Dimensions</label>
-                      <select
-                        className="w-full p-3 border border-gray-300 rounded-lg text-base"
-                        value={pallet.dimensions}
-                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                <div className="flex justify-between items-center mb-2">
+                  <label className="block text-sm font-medium mb-1">Palettes</label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const newPallets = [...newOrder.pallets, { ...DEFAULT_PALLET }];
+                      setNewOrder({
+                        ...newOrder,
+                        pallets: newPallets,
+                        palletCount: newPallets.length.toString()
+                      });
+                    }}
+                    className="bg-blue-100 text-blue-600 px-3 py-1 rounded-lg text-sm font-medium hover:bg-blue-200"
+                  >
+                    + Ajouter une palette
+                  </button>
+                </div>
+                {newOrder.pallets?.map((pallet, index) => (
+                  <div key={index} className="mb-4 p-4 border border-gray-300 rounded-lg">
+                    <div className="flex justify-between items-center">
+                      <h3 className="font-medium mb-3 text-base">Palette {index + 1}</h3>
+                      <button
+                        type="button"
+                        onClick={() => {
                           const newPallets = [...newOrder.pallets];
-                          newPallets[index] = {
-                            ...pallet,
-                            dimensions: e.target.value
-                          };
-                          setNewOrder({ ...newOrder, pallets: newPallets });
+                          newPallets.splice(index, 1);
+                          setNewOrder({
+                            ...newOrder,
+                            pallets: newPallets,
+                            palletCount: newPallets.length.toString()
+                          });
                         }}
-                        required
+                        className="text-red-600 hover:text-red-800"
                       >
-                        <option value="">Sélectionner</option>
-                        {PALLET_DIMENSIONS.map(dim => (
-                          <option key={dim} value={dim}>
-                            {dim}
-                          </option>
-                        ))}
-                      </select>
+                        Supprimer
+                      </button>
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-1">Poids (kg)</label>
-                      <input
-                        type="text"
-                        inputMode="decimal"
-                        className="w-full p-3 border border-gray-300 rounded-lg text-base"
-                        value={pallet.weight}
-                        onChange={e => {
-                          const newPallets = [...newOrder.pallets];
-                          newPallets[index] = {
-                            ...pallet,
-                            weight: parseFloat(e.target.value) || 0
-                          };
-                          setNewOrder({ ...newOrder, pallets: newPallets });
-                        }}
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-1">Hauteur (cm)</label>
-                      <input
-                        type="text"
-                        inputMode="decimal"
-                        className="w-full p-3 border border-gray-300 rounded-lg text-base"
-                        value={pallet.height}
-                        onChange={e => {
-                          const newPallets = [...newOrder.pallets];
-                          newPallets[index] = {
-                            ...pallet,
-                            height: parseFloat(e.target.value) || 0
-                          };
-                          setNewOrder({ ...newOrder, pallets: newPallets });
-                        }}
-                        required
-                      />
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium mb-1">Dimensions</label>
+                        <select
+                          className="w-full p-3 border border-gray-300 rounded-lg text-base"
+                          value={pallet.dimensions}
+                          onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                            const newPallets = [...newOrder.pallets];
+                            newPallets[index] = {
+                              ...pallet,
+                              dimensions: e.target.value
+                            };
+                            setNewOrder({ ...newOrder, pallets: newPallets });
+                          }}
+                          required
+                        >
+                          <option value="">Sélectionner</option>
+                          {PALLET_DIMENSIONS.map(dim => (
+                            <option key={dim} value={dim}>
+                              {dim}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium mb-1">Poids (kg)</label>
+                        <input
+                          type="text"
+                          inputMode="decimal"
+                          className="w-full p-3 border border-gray-300 rounded-lg text-base"
+                          value={pallet.weight}
+                          onChange={e => {
+                            const newPallets = [...newOrder.pallets];
+                            newPallets[index] = {
+                              ...pallet,
+                              weight: parseFloat(e.target.value) || 0
+                            };
+                            setNewOrder({ ...newOrder, pallets: newPallets });
+                          }}
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium mb-1">Hauteur (cm)</label>
+                        <input
+                          type="text"
+                          inputMode="decimal"
+                          className="w-full p-3 border border-gray-300 rounded-lg text-base"
+                          value={pallet.height}
+                          onChange={e => {
+                            const newPallets = [...newOrder.pallets];
+                            newPallets[index] = {
+                              ...pallet,
+                              height: parseFloat(e.target.value) || 0
+                            };
+                            setNewOrder({ ...newOrder, pallets: newPallets });
+                          }}
+                          required
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
 
               <div className="flex flex-col sm:flex-row justify-end gap-4 mt-6">
                 <button

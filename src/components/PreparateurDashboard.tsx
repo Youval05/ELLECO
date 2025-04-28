@@ -233,7 +233,17 @@ const PreparateurDashboard = () => {
             value={editedOrder.plannedDeliveryDate}
             onChange={(e) => {
               console.log('New date value:', e.target.value);
-              setEditedOrder({ ...editedOrder, plannedDeliveryDate: e.target.value });
+              // Si une date est ajoutée et que le statut est "à planifier", le passer à "confirmée"
+              const newStatus = 
+                e.target.value && editedOrder.status === 'à planifier' 
+                  ? 'confirmée' 
+                  : editedOrder.status;
+              
+              setEditedOrder({ 
+                ...editedOrder, 
+                plannedDeliveryDate: e.target.value,
+                status: newStatus
+              });
             }}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base p-3"
           />

@@ -202,7 +202,19 @@ const CommercialDashboard = () => {
             type="date"
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             value={editedOrder.plannedDeliveryDate || ''}
-            onChange={(e) => setEditedOrder({ ...editedOrder, plannedDeliveryDate: e.target.value })}
+            onChange={(e) => {
+              // Si une date est ajoutée et que le statut est "à planifier", le passer à "confirmée"
+              const newStatus = 
+                e.target.value && editedOrder.status === 'à planifier' 
+                  ? 'confirmée' 
+                  : editedOrder.status;
+              
+              setEditedOrder({ 
+                ...editedOrder, 
+                plannedDeliveryDate: e.target.value,
+                status: newStatus
+              });
+            }}
           />
         </div>
 

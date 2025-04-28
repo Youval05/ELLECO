@@ -96,7 +96,8 @@ export const useStore = create<StoreState>()(
       try {
         console.log('Initialisation de la synchronisation...');
         const ordersRef = collection(db, 'orders');
-        const q = query(ordersRef, where('archived', '==', false));
+        // Récupérer toutes les commandes, y compris les archivées
+        const q = query(ordersRef);
         
         const unsubscribe = onSnapshot(q, (snapshot) => {
           const orders: Order[] = [];

@@ -114,6 +114,7 @@ const CommercialDashboard = () => {
   const [editingOrder, setEditingOrder] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [statusFilter, setStatusFilter] = useState('all');
 
   const handlePalletCountChange = (count: number, pallets: Pallet[]) => {
     if (count > pallets.length) {
@@ -139,6 +140,10 @@ const CommercialDashboard = () => {
         order.clientName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         order.reference?.toLowerCase().includes(searchTerm.toLowerCase());
       return matchesSearch;
+    })
+    .filter(order => {
+      if (statusFilter === 'all') return true;
+      return order.status === statusFilter;
     })
     .sort((a, b) => {
       const dateA = new Date(a.createdAt).getTime();
@@ -318,6 +323,18 @@ const CommercialDashboard = () => {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
+            </div>
+            <div>
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="all">Tous les statuts</option>
+                <option value="à planifier">À planifier</option>
+                <option value="confirmée">Confirmée</option>
+                <option value="livrée">Livrée</option>
+              </select>
             </div>
           </div>
 

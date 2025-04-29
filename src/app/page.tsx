@@ -20,7 +20,7 @@ type UserType = 'preparateur' | 'commercial' | null;
 export default function Home() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [selectedType, setSelectedType] = useState<UserType>(null);
-  const { setUser, currentUser, userType, initSync } = useStore();
+  const { setUser, currentUser, userType, initSync, checkOrdersToArchive } = useStore();
   
   useEffect(() => {
     const init = async () => {
@@ -29,6 +29,16 @@ export default function Home() {
         // Initialiser Firestore
         const unsubscribe = initSync();
         console.log('Synchronisation initialisée avec succès');
+        
+        // Vérifier et archiver les commandes dont la date de chargement est passée
+        await checkOrdersToArchive();
+        console.log('Vérification des commandes à archiver terminée');
+        
+        // Configurer une vérification périodique des commandes à archiver (toutes les heures)
+        const archiveInterval = setInterval(() => {
+          checkOrdersToArchive();
+          console.log('Vérification périodique des commandes à archiver effectuée');
+        }, 60 * 60 * 1000); // 60 minutes * 60 secondes * 1000 millisecondes
         
         // Mettre à jour toutes les commandes sans date de création
         const ordersRef = collection(db, 'orders');
@@ -54,6 +64,7 @@ export default function Home() {
 
         return () => {
           if (unsubscribe) unsubscribe();
+          clearInterval(archiveInterval);
         };
       } catch (error) {
         console.error('Erreur lors de l\'initialisation:', error);
@@ -62,7 +73,7 @@ export default function Home() {
     };
 
     init();
-  }, [initSync]);
+  }, [initSync, checkOrdersToArchive]);
 
   const handleAuth = (success: boolean) => {
     setIsAuthenticated(success);

@@ -58,15 +58,17 @@ export const useStore = create<StoreState>()(
 
     checkOrdersToArchive: async () => {
       try {
-        const yesterday = new Date();
-        yesterday.setDate(yesterday.getDate() - 1);
-        yesterday.setHours(23, 59, 59, 999);
+        // Utiliser la date actuelle au lieu d'hier
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Début de la journée actuelle
+        
+        console.log('Vérification des commandes à archiver, date de référence:', today.toISOString());
 
         const ordersRef = collection(db, 'orders');
         const q = query(
           ordersRef,
           where('archived', '==', false),
-          where('plannedDeliveryDate', '<=', yesterday.toISOString())
+          where('plannedDeliveryDate', '<', today.toISOString())
         );
 
         const querySnapshot = await getDocs(q);
